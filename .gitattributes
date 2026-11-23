@@ -1,0 +1,16 @@
+# 换行与二进制：服务器上直接 clone 时，Shell 脚本必须是 LF，否则 bash 报 "bad interpreter"
+*.sh      text eol=lf
+*.bat     text eol=crlf
+*.ps1     text eol=crlf
+
+# 二进制，不做任何换行转换
+*.png     binary
+*.jpg     binary
+*.jpeg    binary
+*.webp    binary
+*.ico     binary
+*.db      binary
+*.xlsx    binary
+*.docx    binary
+*.zip     binary
+*.gz      binary

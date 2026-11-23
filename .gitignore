@@ -33,3 +33,6 @@ tools/gen-ruanzhu*.py
 # 本地验收工具产生的临时目录（Edge 配置 / 截图）
 _edge/
 _shots/
+
+# 出包产物（上传用，不进仓库）
+dist/
