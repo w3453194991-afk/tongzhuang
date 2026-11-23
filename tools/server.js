@@ -1,5 +1,5 @@
 // 本地静态服务（零依赖）。用途：让浏览器以 http 方式打开，localStorage / 打印 / 下载更稳。
-// 支持 Range（大视频拖动/秒开必须）、HEAD、Content-Length。
+// 支持 Range（大文件拖动/秒开必须）、HEAD、Content-Length。
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -150,7 +150,7 @@ async function redfoxApi(req, res) {
 
   try {
     if (u.pathname === '/api/redfox/tools') {
-      await rfRpc(platform, key, 'initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'gy-hub', version: '1' } }, 1);
+      await rfRpc(platform, key, 'initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'xm-kids', version: '1' } }, 1);
       const r = await rfRpc(platform, key, 'tools/list', {}, 2);
       const msg = r.msgs.find(x => x.id === 2) || r.msgs[0] || {};
       if (msg.error) return sendJson(res, 200, { ok: false, error: msg.error.message || 'tools/list 失败' });
@@ -167,7 +167,7 @@ async function redfoxApi(req, res) {
       const p = JSON.parse(body || '{}');
       const tool = String(p.tool || '');
       if (!tool) return sendJson(res, 400, { ok: false, error: '缺少 tool' });
-      await rfRpc(platform, key, 'initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'gy-hub', version: '1' } }, 1);
+      await rfRpc(platform, key, 'initialize', { protocolVersion: '2024-11-05', capabilities: {}, clientInfo: { name: 'xm-kids', version: '1' } }, 1);
       const r = await rfRpc(platform, key, 'tools/call', { name: tool, arguments: p.args || {} }, 2);
       const msg = r.msgs.find(x => x.id === 2) || r.msgs[0] || {};
       if (msg.error) return sendJson(res, 200, { ok: false, error: msg.error.message || '调用失败' });
@@ -185,7 +185,7 @@ async function redfoxApi(req, res) {
   }
 }
 
-/* ---- 型号查询：/api/lookup?q=xxx ---- */
+/* ---- 款号查询：/api/lookup?q=xxx ---- */
 function decodeDdg(href) {
   const m = /uddg=([^&]+)/.exec(href || '');
   if (m) { try { return decodeURIComponent(m[1]); } catch (e) { return href; } }
@@ -201,8 +201,8 @@ async function lookupApi(req, res) {
   const q = String(u.query.q || '').trim().slice(0, 120);
   if (!q) return sendJson(res, 200, { ok: false, error: '缺少关键词' });
   const UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36';
-  /* 型号多是纯代码，搜索词补一句上下文，免得搜到显示器、电池等同名结果 */
-  const qq = /brake|pad|刹车|制动/i.test(q) ? q : q + ' brake pad';
+  /* 款号多是纯代码，搜索词补一句上下文，免得搜到显示器、电池等同名结果 */
+  const qq = /kids|children|童装|款号/i.test(q) ? q : q + ' kids clothing';
   try {
     /* 先 DuckDuckGo（返回干净，无广告） */
     let items = [];
@@ -441,7 +441,7 @@ http.createServer((req, res) => {
   });
 }).listen(PORT, HOST, () => {
   console.log('');
-  console.log('  冠英 · 选型与报价中台已启动');
+  console.log('  小满童装 · 选款与报价中台已启动');
   console.log('  监听: ' + HOST + ':' + PORT);
   console.log('  本机打开： http://127.0.0.1:' + PORT + '/index.html');
   if (HOST !== '127.0.0.1') console.log('  局域网/服务器访问： http://<这台机器的IP>:' + PORT + '/index.html');

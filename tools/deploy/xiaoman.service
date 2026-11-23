@@ -1,0 +1,20 @@
+[Unit]
+Description=XIAOMAN KIDS Selection & Quotation Hub
+After=network.target
+
+[Service]
+Type=simple
+# 改成你服务器上的实际目录
+WorkingDirectory=/opt/xiaoman
+Environment=HOST=127.0.0.1
+Environment=PORT=8765
+# 可选：RedFox Key（也可写在 tools/redfox-key.txt）
+# Environment=REDFOX_KEY=你的key
+ExecStart=/usr/bin/node tools/server.js
+Restart=always
+RestartSec=3
+StandardOutput=append:/var/log/xiaoman.log
+StandardError=append:/var/log/xiaoman.log
+
+[Install]
+WantedBy=multi-user.target

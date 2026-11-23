@@ -22,7 +22,7 @@ if __name__ == "__main__":
     os.chdir(ROOT)
     with socketserver.TCPServer(("127.0.0.1", PORT), Handler) as httpd:
         print("")
-        print("  冠英 · 选型与报价中台已启动")
+        print("  小满童装 · 选款与报价中台已启动")
         print("  浏览器打开： http://127.0.0.1:%d/index.html" % PORT)
         print("  关闭本窗口即停止服务。")
         print("")

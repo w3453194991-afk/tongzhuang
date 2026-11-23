@@ -3,8 +3,8 @@
 window.AUTH = (function () {
   const KEY = 'gy_users_v1';
   const SES = 'gy_session_v1';
-  const STAFF_CODE = 'GY2024';
-  const BOSS_CODE = 'GYBOSS';
+  const STAFF_CODE = 'XM2026';
+  const BOSS_CODE = 'XMBOSS';
   const CONTACT_TYPES = ['WhatsApp', 'Phone', 'Email', 'WeChat', 'Telegram', 'Viber', 'Other'];
 
   const now = () => Date.now();
@@ -48,11 +48,11 @@ window.AUTH = (function () {
         created: min(60 * 24 * 9), lastSeen: min(35),
         events: [
           { t: min(60 * 5), type: 'search', d: { q: 'también necesitamos pastillas traseras 200 sets' } },
-          { t: min(60 * 5 - 2), type: 'view', d: { code: 'HOWO1' } },
+          { t: min(60 * 5 - 2), type: 'view', d: { code: 'SW2601047' } },
           { t: min(60 * 4), type: 'search', d: { q: 'HOWO A7 pastillas traseras' } },
-          { t: min(60 * 4 - 3), type: 'view', d: { code: 'HOWO1' } },
-          { t: min(60 * 3), type: 'view', d: { code: 'CA9T R' } },
-          { t: min(120), type: 'addCart', d: { code: 'HOWO1' } },
+          { t: min(60 * 4 - 3), type: 'view', d: { code: 'SW2601047' } },
+          { t: min(60 * 3), type: 'view', d: { code: 'DR2601001' } },
+          { t: min(120), type: 'addCart', d: { code: 'SW2601047' } },
           { t: min(60), type: 'quote' },
           { t: min(35), type: 'pack' }
         ]
@@ -63,8 +63,8 @@ window.AUTH = (function () {
         created: min(60 * 24 * 21), lastSeen: min(60 * 26),
         events: [
           { t: min(60 * 26), type: 'search', d: { q: 'فحمات فرامل HOWO 457' } },
-          { t: min(60 * 25), type: 'view', d: { code: '29087' } },
-          { t: min(60 * 25 - 4), type: 'view', d: { code: 'HOWO1' } },
+          { t: min(60 * 25), type: 'view', d: { code: 'TS2601087' } },
+          { t: min(60 * 25 - 4), type: 'view', d: { code: 'SW2601047' } },
           { t: min(60 * 24), type: 'quote' }
         ]
       },
@@ -74,7 +74,7 @@ window.AUTH = (function () {
         created: min(60 * 24 * 6), lastSeen: min(60 * 8),
         events: [
           { t: min(60 * 9), type: 'search', d: { q: 'má phanh HOWO A7' } },
-          { t: min(60 * 8), type: 'view', d: { code: 'HOWO1' } }
+          { t: min(60 * 8), type: 'view', d: { code: 'SW2601047' } }
         ]
       },
       {
@@ -83,8 +83,8 @@ window.AUTH = (function () {
         created: min(60 * 24 * 30), lastSeen: min(60 * 47),
         events: [
           { t: min(60 * 48), type: 'search', d: { q: 'pastilha de freio 29087 preço' } },
-          { t: min(60 * 47), type: 'view', d: { code: '29087' } },
-          { t: min(60 * 47 - 6), type: 'addCart', d: { code: '29087' } }
+          { t: min(60 * 47), type: 'view', d: { code: 'TS2601087' } },
+          { t: min(60 * 47 - 6), type: 'addCart', d: { code: 'TS2601087' } }
         ]
       }
     ];
@@ -113,8 +113,8 @@ window.AUTH = (function () {
       let u = db.users.find(x => x.role === 'boss' && !x.demo);
       if (!u) {
         u = {
-          id: 'B1', role: 'boss', name: o.name || '老板', company: 'KOOYING', country: '中国',
-          contact: { type: 'Email', value: o.value || 'boss@kooying.com' }, tags: [], created: now(), lastSeen: now(), events: []
+          id: 'B1', role: 'boss', name: o.name || '老板', company: 'XIAOMAN KIDS', country: '中国',
+          contact: { type: 'Email', value: o.value || 'boss@xiaomankids.com' }, tags: [], created: now(), lastSeen: now(), events: []
         };
         db.users.push(u);
       }
@@ -126,8 +126,8 @@ window.AUTH = (function () {
       let u = db.users.find(x => x.role === 'staff' && !x.demo);
       if (!u) {
         u = {
-          id: 'S1', role: 'staff', name: o.name || '销售顾问', company: 'KOOYING', country: '中国',
-          contact: { type: 'Email', value: o.value || 'sales@kooying.com' }, tags: [], created: now(), lastSeen: now(), events: []
+          id: 'S1', role: 'staff', name: o.name || '销售顾问', company: 'XIAOMAN KIDS', country: '中国',
+          contact: { type: 'Email', value: o.value || 'sales@xiaomankids.com' }, tags: [], created: now(), lastSeen: now(), events: []
         };
         db.users.push(u);
       }
@@ -192,19 +192,19 @@ window.AUTH = (function () {
     if (!u) {
       u = boss
         ? {
-          id, role: 'boss', demo: true, name: '体验老板', company: 'KOOYING (demo)', country: '中国',
-          contact: { type: 'Demo', value: 'demo.boss@kooying.local' }, tags: ['体验版'],
+          id, role: 'boss', demo: true, name: '体验老板', company: '小满童装（体验）', country: '中国',
+          contact: { type: 'Demo', value: 'demo.boss@xiaomankids.local' }, tags: ['体验版'],
           created: now(), lastSeen: now(), events: []
         }
         : staff
         ? {
-          id, role: 'staff', demo: true, name: '体验员工', company: 'KOOYING (demo)', country: '中国',
-          contact: { type: 'Demo', value: 'demo.staff@kooying.local' }, tags: ['体验版'],
+          id, role: 'staff', demo: true, name: '体验员工', company: '小满童装（体验）', country: '中国',
+          contact: { type: 'Demo', value: 'demo.staff@xiaomankids.local' }, tags: ['体验版'],
           created: now(), lastSeen: now(), events: []
         }
         : {
           id, role: 'customer', demo: true, name: '体验账号', company: 'Demo visitor', country: '',
-          contact: { type: 'Demo', value: 'demo@kooying.local' }, tags: ['体验版'],
+          contact: { type: 'Demo', value: 'demo@xiaomankids.local' }, tags: ['体验版'],
           created: now(), lastSeen: now(), events: []
         };
       db.users.push(u);
@@ -252,7 +252,7 @@ window.AUTH = (function () {
     const c = (u && u.contact) || {};
     const v = (c.value || '').trim();
     const digits = v.replace(/[^\d]/g, '');
-    if (v.includes('@')) return 'mailto:' + v + '?subject=' + encodeURIComponent('KOOYING brake pads') + '&body=' + encodeURIComponent(text);
+    if (v.includes('@')) return 'mailto:' + v + '?subject=' + encodeURIComponent('XIAOMAN KIDS brake pads') + '&body=' + encodeURIComponent(text);
     if (digits) return 'https://wa.me/' + digits + '?text=' + encodeURIComponent(text);
     return '';
   }

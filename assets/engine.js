@@ -48,9 +48,10 @@ window.Engine = (function () {
   const confTag = c => c === '已确认' || c === '高' ? 'g' : c === '中' ? 'y' : 'r';
   const typeLabel = t => {
     const M = {
-      OE: ['OE 原厂号', 'OE number'], WVA: ['WVA 号', 'WVA number'],
-      '客户叫法': ['客户叫法', "Customer's name"], '工厂码': ['工厂码', 'Factory code'],
-      '内部码': ['内部码', 'Internal code'], '竞品码': ['竞品码', 'Competitor code']
+      '条码 EAN': ['条码 EAN', 'Barcode'], '款号': ['款号', 'Style no.'],
+      '内部款号': ['内部款号', 'Internal style'], '客户款号': ['客户款号', "Customer's ref"],
+      '旧款号': ['旧款号', 'Old style'], '平台款号': ['平台款号', 'Platform code'],
+      '竞品款号': ['竞品款号', 'Competitor ref']
     };
     const zh = !window.I18N || window.I18N.getLang() === 'zh';
     const p = M[t];
@@ -58,8 +59,8 @@ window.Engine = (function () {
   };
 
   /* ---------- 查询理解 ---------- */
-  const POSWORDS = { '后桥': '后', '后片': '后', '后轮': '后', 'rear': '后', '后刹车': '后', '前桥': '前', '前片': '前', '前轮': '前', 'front': '前', '前刹车': '前' };
-  const MATWORDS = { '陶瓷': 'CM', 'ceramic': 'CM', '半金属': 'SM', 'semi': 'SM', '低金属': 'LM', 'lowmetallic': 'LM', 'nao': 'NAO', '无石棉': 'NAO', '芳纶': 'HD', '重载': 'HD', 'heavy': 'HD', '风电': 'WT' };
+  const POSWORDS = { '宽松': '宽松', 'oversized': '宽松', 'loose': '宽松', '标准': '标准', 'regular': '标准', '修身': '修身', 'slim': '修身', 'fitted': '修身' };
+  const MATWORDS = { '纯棉': 'CO', 'cotton': 'CO', '莫代尔': 'MD', 'modal': 'MD', '摇粒绒': 'FL', '加绒': 'FL', 'fleece': 'FL', '防水': 'PC', '冲锋衣': 'PC', 'waterproof': 'PC', '竹节棉': 'BB', 'bamboo': 'BB', '羊毛': 'WL', 'wool': 'WL' };
 
   function parse(q) {
     const raw = String(q || '');
@@ -70,27 +71,27 @@ window.Engine = (function () {
     const codeHits = [];
 
     // 数量
-    const qm = qLow.match(/(\d{2,5})\s*(套|片|件|组|pcs|sets?|set|pairs?)/);
+    const qm = qLow.match(/(\d{2,5})\s*(件|套|pcs|sets?|set|pairs?)/);
     if (qm) { qty = Number(qm[1]); entities.push({ k: '数量', v: qty + ' ' + qm[2], c: '来自询盘原文' }); }
-    else { const qm2 = raw.match(/(?:数量|qty|quantity)\s*[:：]?\s*(\d{2,5})/i); if (qm2) { qty = Number(qm2[1]); entities.push({ k: '数量', v: qty + ' 套', c: '来自询盘原文' }); } }
+    else { const qm2 = raw.match(/(?:数量|qty|quantity)\s*[:：]?\s*(\d{2,5})/i); if (qm2) { qty = Number(qm2[1]); entities.push({ k: '数量', v: qty + ' 件', c: '来自询盘原文' }); } }
 
     // 位置
     for (const k in POSWORDS) if (qLow.includes(k.toLowerCase())) { pos = POSWORDS[k]; break; }
-    if (pos) entities.push({ k: '部位', v: pos + '轮 / ' + (pos === '前' ? 'front' : 'rear'), c: '关键词识别' });
+    if (pos) entities.push({ k: '版型', v: pos + '版 / ' + (pos === '宽松' ? 'loose' : pos === '修身' ? 'slim' : 'regular'), c: '关键词识别' });
 
     // 材质
     for (const k in MATWORDS) if (qLow.includes(k.toLowerCase())) { mat = MATWORDS[k]; break; }
-    if (mat) entities.push({ k: '材质诉求', v: D.materials.find(m => m.id === mat).name, c: '客户指定配方' });
+    if (mat) entities.push({ k: '面料诉求', v: (D.materials.find(m => m.id === mat) || { name: mat }).name, c: '客户指定面料' });
 
-    // 车型（最长别名优先）
+    // 款式系列（最长别名优先）
     let bestV = 0, vHit = '';
     vAlias.forEach(x => { if (qn.includes(x.n) && x.n.length > bestV) { bestV = x.n.length; vehicle = x.v; vHit = x.n; } });
-    if (vehicle) entities.push({ k: '车型', v: `${vehicle.brand} ${vehicle.series} ${vehicle.model}`, c: `命中别名「${vHit}」` });
+    if (vehicle) entities.push({ k: '款式系列', v: `${vehicle.brand} · ${vehicle.series} ${vehicle.model}`, c: `命中别名「${vHit}」` });
 
-    // 车桥
+    // 尺码段
     let bestA = 0, aHit = '';
     aAlias.forEach(x => { if (qn.includes(x.n) && x.n.length > bestA) { bestA = x.n.length; axle = x.a; aHit = x.n; } });
-    if (axle) entities.push({ k: '车桥', v: `${axle.brand} ${axle.model}（${axle.type} ${axle.cap}）`, c: `命中别名「${aHit}」` });
+    if (axle) entities.push({ k: '尺码段', v: `尺码 ${axle.model}（${axle.type} · ${axle.cap}）`, c: `命中别名「${aHit}」` });
 
     // 编码：包含匹配（取最长）+ 模糊
     let bestCode = null;
@@ -100,7 +101,7 @@ window.Engine = (function () {
     });
     if (bestCode) {
       codeHits.push(bestCode);
-      entities.push({ k: '编码', v: bestCode.code, c: `命中 ${typeLabel(bestCode.type)}` });
+      entities.push({ k: '编号', v: bestCode.code, c: `命中 ${typeLabel(bestCode.type)}` });
     } else if (qn.length >= 4) {
       let bestD = 3;
       codeFlat.forEach(c => {
@@ -109,7 +110,7 @@ window.Engine = (function () {
         if (d < bestD) { bestD = d; codeHits.length = 0; codeHits.push(c); }
       });
       if (bestD <= 1 && codeHits.length) {
-        entities.push({ k: '编码', v: codeHits[0].code, c: `模糊匹配（编辑距离 ${bestD}）` });
+        entities.push({ k: '编号', v: codeHits[0].code, c: `模糊匹配（编辑距离 ${bestD}）` });
       }
     }
 
@@ -129,30 +130,30 @@ window.Engine = (function () {
       cand.set(pid, cur);
     };
 
-    // 1) 编码
+    // 1) 编号
     p.codeHits.slice(0, 4).forEach(c => {
-      add(c.pid, c.type === 'OE' ? 98 : 96, `命中编码 <b>${esc(c.code)}</b>（${typeLabel(c.type)}，来源：${esc(c.source)}）`);
+      add(c.pid, c.type === '条码 EAN' ? 98 : 96, `命中编号 <b>${esc(c.code)}</b>（${typeLabel(c.type)}，来源：${esc(c.source)}）`);
     });
-    // 2) 车型 × 车桥
+    // 2) 款式系列 × 尺码段
     if (p.vehicle) {
       const fs = fitsByV.get(p.vehicle.id) || [];
       fs.forEach(f => {
         const ax = f.aid ? D.axles.find(a => a.id === f.aid) : null;
         let s = 70 + (CONF[f.conf] || 0);
-        const rs = [`车型匹配：${esc(f.vName)}`];
-        if (ax) rs.push(`车桥匹配：${esc(ax.brand + ' ' + ax.model)}（${ax.type}）`);
-        if (p.pos && f.pos === p.pos) { s += 6; rs.push(`部位一致：${f.pos}轮`); }
-        if (p.pos && f.pos && f.pos !== p.pos) { s -= 8; rs.push(`注意：本关系为${f.pos}轮，与询价部位不同`); }
-        if (p.axle && ax && p.axle.id === ax.id) { s += 14; rs.push('车桥已确认，可直接锁定'); }
-        rs.push(`适配类型：${esc(f.fit)}｜置信度：${esc(f.conf)}｜来源：${esc(f.src)}`);
+        const rs = [`系列匹配：${esc(f.vName)}`];
+        if (ax) rs.push(`尺码段匹配：${esc('尺码 ' + ax.model)}（${ax.type} · ${ax.cap}）`);
+        if (p.pos && f.pos === p.pos) { s += 6; rs.push(`版型一致：${f.pos}版`); }
+        if (p.pos && f.pos && f.pos !== p.pos) { s -= 8; rs.push(`注意：本关系为${f.pos}版，与客户要求版型不同`); }
+        if (p.axle && ax && p.axle.id === ax.id) { s += 14; rs.push('尺码段已确认，可直接锁定'); }
+        rs.push(`适穿类型：${esc(f.fit)}｜置信度：${esc(f.conf)}｜来源：${esc(f.src)}`);
         add(f.pid, s, rs.join('<br>'));
       });
     }
-    // 3) 车桥
+    // 3) 尺码段
     if (p.axle) {
       (fitsByA.get(p.axle.id) || []).forEach(f => {
         const s = 62 + (CONF[f.conf] || 0) + (p.pos && f.pos === p.pos ? 6 : 0);
-        add(f.pid, s, `车桥匹配：${esc(p.axle.brand + ' ' + p.axle.model)}<br>适配：${esc(f.vName)}｜${esc(f.fit)}｜置信度 ${esc(f.conf)}`);
+        add(f.pid, s, `尺码段匹配：${esc('尺码 ' + p.axle.model)}<br>适穿：${esc(f.vName)}｜${esc(f.fit)}｜置信度 ${esc(f.conf)}`);
       });
     }
     // 4) 产品名 / 编码全文兜底
@@ -172,7 +173,7 @@ window.Engine = (function () {
     list = list.map(c => {
       const pr = byId.get(c.pid);
       let note = '';
-      if (p.mat && pr.material !== p.mat) note = `客户指定 <b>${D.materials.find(m => m.id === p.mat).name}</b>，本品默认 ${D.materials.find(m => m.id === pr.material).name}，下单时可指定配方`;
+      if (p.mat && pr.material !== p.mat) note = `客户指定 <b>${(D.materials.find(m => m.id === p.mat) || { name: p.mat }).name}</b>，本款默认 ${(D.materials.find(m => m.id === pr.material) || { name: pr.material }).name}，下单时可换面料`;
       return { ...c, product: pr, note };
     });
 
@@ -185,18 +186,18 @@ window.Engine = (function () {
     const vFitCount = p.vehicle ? (fitsByV.get(p.vehicle.id) || []).length : 0;
     if (p.vehicle && vFitCount > 1) {
       const axNames = [...new Set((fitsByV.get(p.vehicle.id) || []).map(f => f.aid ? D.axles.find(a => a.id === f.aid) : null).filter(Boolean).map(a => `${a.brand} ${a.model}`))];
-      questions.unshift(`<b>${esc(p.vehicle.brand + ' ' + p.vehicle.series + ' ' + p.vehicle.model)}</b> 在本库有 ${axNames.length} 种车桥配置（${axNames.map(esc).join(' / ')}），仅凭车型不能唯一锁定——需确认车桥或数旧片孔数。`);
-      if (!p.axle) questions.push('让客户拍车桥铭牌，或直接数旧片孔数（8 孔 / 15 孔 / 16 孔差异最明显）。');
+      questions.unshift(`<b>${esc(p.vehicle.brand + ' · ' + p.vehicle.series + ' ' + p.vehicle.model)}</b> 在本库有 ${axNames.length} 个尺码段（${axNames.map(esc).join(' / ')}），仅凭系列不能唯一锁定 —— 需确认孩子身高或水洗标尺码。`);
+      if (!p.axle) questions.push('让客户拍水洗标，或直接报身高体重（90 / 110 / 4T 的平铺尺寸差异最明显）。');
     }
     if (p.vehicle && !p.axle) {
       const options = (fitsByV.get(p.vehicle.id) || []).map(f => {
         const ax = f.aid ? D.axles.find(a => a.id === f.aid) : null;
         const pr = byId.get(f.pid);
-        return `<li>${ax ? esc(ax.brand + ' ' + ax.model + '（' + ax.spec + '）') : '按旧件确认'} → <b>${esc(pr.code)}</b>（${esc(f.pos)}轮 · ${esc(f.conf)}）</li>`;
+        return `<li>${ax ? esc('尺码 ' + ax.model + '（' + ax.spec + '）') : '按旧款确认'} → <b>${esc(pr.code)}</b>（${esc(f.pos)}版 · ${esc(f.conf)}）</li>`;
       });
       if (options.length > 1) questions.push('可能的对应关系：<ul style="margin:4px 0 0;padding-left:16px">' + options.join('') + '</ul>');
     }
-    if (top && top.score < 80 && p.qn.length >= 3) questions.push('当前匹配为推断结果，请核对旧件尺寸或编码后再报价。');
+    if (top && top.score < 80 && p.qn.length >= 3) questions.push('当前匹配为推断结果，请核对平铺尺寸或水洗标款号后再报价。');
 
     const L = (zh, en) => { try { return window.I18N && window.I18N.getLang() !== 'zh' ? en : zh; } catch (e) { return zh; } };
     const grade = !top ? { l: L('无匹配', 'No match'), c: 'c-lo' } : top.score >= 90 ? { l: L('可直接报价', 'Ready to quote'), c: 'c-hi' }
@@ -206,7 +207,7 @@ window.Engine = (function () {
     return { entities: p.entities, parsed: p, candidates: list, questions, grade, top };
   }
 
-  /* ---- 车型 → 车桥 → 型号 矩阵 ---- */
+  /* ---- 款式系列 → 尺码段 → 款号 矩阵 ---- */
   function matrix(vid) {
     const fs = fitsByV.get(vid) || [];
     return fs.map(f => ({
@@ -220,12 +221,15 @@ window.Engine = (function () {
   const GRADES = { A: .97, B: 1, C: 1.03, '': 1 };
   const LEVELS = { '大客户': .95, '标准': 1, '经济': .96, '': 1 };
   const tierOf = q => TIERS.find(t => q >= t.min).f;
-  const tierName = q => q >= 1000 ? '1000+ 套' : q >= 300 ? '300–999 套' : q >= 100 ? '100–299 套' : '1–99 套';
+  const tierName = q => q >= 1000 ? '1000+ 件' : q >= 300 ? '300–999 件' : q >= 100 ? '100–299 件' : '1–99 件';
 
   function priceOf(pid, qty, customer, matId) {
     const pr = byId.get(pid);
-    const mat = D.materials.find(m => m.id === (matId || pr.material)) || D.materials[0];
-    const base = pr.price * mat.factor * tierOf(qty) * (GRADES[customer?.grade] || 1) * (LEVELS[customer?.priceLevel] || 1);
+    const own = D.materials.find(m => m.id === pr.material) || D.materials[0];
+    const mat = D.materials.find(m => m.id === (matId || pr.material)) || own;
+    // 款价已含默认面料成本；只有客户指定换面料时才按系数差额定差价
+    const matFactor = (mat.id === own.id) ? 1 : (mat.factor / (own.factor || 1));
+    const base = pr.price * matFactor * tierOf(qty) * (GRADES[customer?.grade] || 1) * (LEVELS[customer?.priceLevel] || 1);
     return Math.max(0.5, Math.round(base * 100) / 100);
   }
 
@@ -249,18 +253,18 @@ window.Engine = (function () {
   function scoreLead(l) {
     const name = (l.company || '').toLowerCase();
     const trading = /trading|import|export|fze|贸易|进出口/.test(name);
-    const terminal = /fleet|transport|taller|repair|center|车队|修理|物流|运输/.test(name) || /车队|修理厂/.test(l.note || '');
-    const spec = (l.product || []).length ? 14 : (/howo|j6|bpw|actros|j6p|豪沃|解放|德龙|天龙|fvr|npr|hino/i.test(l.need || '') ? 10 : 0);
-    const vol = /(\d{2,5})\s*(sets?|套|pcs|片|unidades|台)/i.test(l.need || '') ? 12 : 0;
+    const terminal = /boutique|kids|children|baby|nursery|retail|母婴|童装|买手|连锁|门店/.test(name) || /母婴店|童装店|连锁|买手店/.test(l.note || '');
+    const spec = (l.product || []).length ? 14 : (/dress|hoodie|bodysuit|dungaree|jeans|tee|连衣裙|卫衣|连体衣|裤|外套|套装/i.test(l.need || '') ? 10 : 0);
+    const vol = /(\d{2,5})\s*(sets?|件|套|pcs|unidades|piezas)/i.test(l.need || '') ? 12 : 0;
     const reach = l.contact && l.contact !== '—' ? 10 : 0;
     const base = 30;
     let s = base + (terminal ? 18 : 0) - (trading ? 14 : 0) + spec + vol + reach + (l.tz ? 4 : 0);
     s = Math.max(5, Math.min(99, Math.round(s)));
     const reasons = [
-      terminal ? '终端属性：车队/修理厂/物流（+18）' : '未见终端属性（0）',
+      terminal ? '终端属性：母婴/童装连锁或买手店（+18）' : '未见终端属性（0）',
       trading ? '名称/备注含贸易商特征（-14）' : '未见贸易商特征（0）',
-      spec ? '需求含具体车型或型号（+14）' : '需求描述笼统（0）',
-      vol ? '含明确数量/车队规模（+12）' : '未给数量（0）',
+      spec ? '需求含具体品类或款号（+14）' : '需求描述笼统（0）',
+      vol ? '含明确数量/门店规模（+12）' : '未给数量（0）',
       reach ? '有实名联系人（+10）' : '无联系人（0）'
     ];
     const tier = s >= 75 ? { l: 'A 优先跟进', c: 'g' } : s >= 55 ? { l: 'B 常规跟进', c: 'y' } : { l: 'C 暂缓投入', c: 'n' };
@@ -320,7 +324,7 @@ window.Engine = (function () {
         </div>
       </div>
       <table class="p-table">
-        <thead><tr><th>#</th><th>Item / 型号</th><th>Type / 类型</th><th>Size / 规格</th><th class="right">Qty</th><th class="right">Unit (USD)</th><th class="right">Amount</th></tr></thead>
+        <thead><tr><th>#</th><th>Style / 款号</th><th>Category / 品类</th><th>Size / 尺码</th><th class="right">Qty</th><th class="right">Unit (USD)</th><th class="right">Amount</th></tr></thead>
         <tbody>${rows}</tbody>
         <tfoot>
           <tr><td colspan="6" class="right"><b>Goods subtotal</b></td><td class="right"><b>${money(calc.amount)}</b></td></tr>
@@ -341,7 +345,7 @@ window.Engine = (function () {
           <div style="border-top:1px solid #333;padding-top:3px">Authorized Signature</div>
         </div>
       </div>
-      <div class="p-note">${esc(co.name)} ｜ ${esc(co.web)} ｜ 本报价单由「冠英 · 选型与报价中台」自动生成，型号依据见适配关系与试验报告附页。</div>
+      <div class="p-note">${esc(co.name)} ｜ ${esc(co.web)} ｜ 本报价单由「小满童装 · 选款与报价中台」自动生成，尺码与面料依据见适穿关系与质检报告附页。</div>
     </div>`;
   }
 
@@ -367,37 +371,37 @@ window.Engine = (function () {
           <div style="font-size:17px;font-weight:800;letter-spacing:.5px">${esc(pr.code)}</div>
           <div style="font-size:10px;color:#555;margin-bottom:6px">${esc(pr.nameEn.slice(0, 90))}</div>
           <table class="p-table">
-            <tr><th style="width:31%">Type 类型</th><td>${esc(pr.cat)} / ${esc(pr.catEn)}</td></tr>
-            <tr><th>Position 部位</th><td>${esc(pr.pos ? pr.pos + '轮' : '按适配车型')}</td></tr>
-            <tr><th>Size 规格</th><td>${esc(pr.dim || '待确认（见适配页）')}${pr.holes ? ' · ' + pr.holes + ' 孔' : ''}</td></tr>
-            <tr><th>Material 材质</th><td>${esc(mat.name)} / ${esc(mat.nameEn)}（μ ${esc(mat.mu)}，${esc(mat.temp)}）</td></tr>
+            <tr><th style="width:31%">Category 品类</th><td>${esc(pr.cat)} / ${esc(pr.catEn)}</td></tr>
+            <tr><th>Fit 版型</th><td>${esc(pr.pos ? pr.pos + '版' : '按适穿记录')}</td></tr>
+            <tr><th>Size 尺码</th><td>${esc(pr.dim || '待确认（见适穿页）')}${pr.holes ? ' · ' + pr.holes + ' g/m²' : ''}</td></tr>
+            <tr><th>Fabric 面料</th><td>${esc(mat.name)} / ${esc(mat.nameEn)}（${esc(mat.mu)}，${esc(mat.temp)}）</td></tr>
             <tr><th>Brand 品牌</th><td>${esc(pr.brand)}</td></tr>
             <tr><th>Packing 包装</th><td>${esc(pr.pack.per)}；毛重 ${pr.pack.gw} kg/箱；${pr.pack.cbm} CBM/箱</td></tr>
             <tr><th>HS Code</th><td>${esc(pr.hs)}</td></tr>
-            <tr><th>MOQ</th><td>${pr.moq} ${pr.cat === '风电刹车片' ? '件' : '套'}</td></tr>
+            <tr><th>MOQ</th><td>${pr.moq} 件</td></tr>
           </table>
         </div>
       </div>
       <div style="display:flex;gap:14px;margin-top:10px">
         <div style="flex:1">
-          <div style="font-weight:700;font-size:10px;border-bottom:1px solid #999;padding-bottom:2px;margin-bottom:4px">CROSS REFERENCE / 编码对照</div>
+          <div style="font-weight:700;font-size:10px;border-bottom:1px solid #999;padding-bottom:2px;margin-bottom:4px">CROSS REFERENCE / 编号对照</div>
           <table class="p-table"><thead><tr><th>Code</th><th>Type</th><th>Source</th></tr></thead><tbody>
           ${codes.slice(0, 8).map(c => `<tr><td>${esc(c.code)}</td><td>${esc(typeLabel(c.type))}</td><td>${esc(c.source)}</td></tr>`).join('') || '<tr><td colspan="3">—</td></tr>'}
           </tbody></table>
         </div>
         <div style="flex:1">
-          <div style="font-weight:700;font-size:10px;border-bottom:1px solid #999;padding-bottom:2px;margin-bottom:4px">FITMENT / 适配车型</div>
-          <table class="p-table"><thead><tr><th>Vehicle</th><th>Axle</th><th>Conf.</th></tr></thead><tbody>
-          ${fs.slice(0, 6).map(f => `<tr><td>${esc(f.vName)}</td><td>${esc(f.aName)}</td><td>${esc(f.conf)}</td></tr>`).join('') || '<tr><td colspan="3">通用件，按旧件确认</td></tr>'}
+          <div style="font-weight:700;font-size:10px;border-bottom:1px solid #999;padding-bottom:2px;margin-bottom:4px">FITMENT / 适穿关系</div>
+          <table class="p-table"><thead><tr><th>Series</th><th>Size band</th><th>Conf.</th></tr></thead><tbody>
+          ${fs.slice(0, 6).map(f => `<tr><td>${esc(f.vName)}</td><td>${esc(f.aName)}</td><td>${esc(f.conf)}</td></tr>`).join('') || '<tr><td colspan="3">基础款，按旧款尺码确认</td></tr>'}
           </tbody></table>
         </div>
       </div>
       ${ts.length ? `<div style="margin-top:10px">
-        <div style="font-weight:700;font-size:10px;border-bottom:1px solid #999;padding-bottom:2px;margin-bottom:4px">TEST REPORT / 试验报告摘要</div>
+        <div style="font-weight:700;font-size:10px;border-bottom:1px solid #999;padding-bottom:2px;margin-bottom:4px">TEST REPORT / 质检报告摘要</div>
         <table class="p-table"><thead><tr><th>Standard</th><th>Item</th><th>Result</th><th>Lab</th><th>Report No.</th><th>Date</th></tr></thead><tbody>
         ${ts.map(t => `<tr><td>${esc(t.std)}</td><td>${esc(t.item)}</td><td>${esc(t.result)}</td><td>${esc(t.lab)}</td><td>${esc(t.no)}</td><td>${esc(t.date)}</td></tr>`).join('')}
         </tbody></table></div>` : ''}
-      <div class="p-note">数据来源：${esc(D.meta.company.name)} 产品目录与检测台账。规格以实际产品为准；如与旧件不符，以实物测绘结果为准。</div>
+      <div class="p-note">数据来源：${esc(D.meta.company.name)} 商品库与质检台账。尺码以实际产前样为准；如与客户样衣不符，以双方确认的产前样为准。</div>
     </div>`;
   }
 
@@ -406,20 +410,20 @@ window.Engine = (function () {
     return `<div class="p-page">
       <div style="height:40px"></div>
       <div style="font-size:11px;letter-spacing:3px;color:#777">TECHNICAL &amp; COMMERCIAL PACKAGE</div>
-      <div style="font-size:30px;font-weight:800;margin:6px 0 2px">产品与报价资料包</div>
+      <div style="font-size:30px;font-weight:800;margin:6px 0 2px">款式与报价资料包</div>
       <div style="font-size:13px;color:#444">${esc(co.nameEn)}</div>
       <div style="height:18px"></div>
       <table class="p-table" style="font-size:11px">
         <tr><th style="width:26%">Customer 客户</th><td>${esc(customer.name)}（${esc(customer.country)} · ${esc(customer.type)}）</td></tr>
         <tr><th>Reference 编号</th><td>${esc(no)}</td></tr>
         <tr><th>Date 日期</th><td>${esc(date)}</td></tr>
-        <tr><th>Items 型号</th><td>${items.map(it => esc(byId.get(it.pid).code)).join(' · ')}</td></tr>
-        <tr><th>Prepared by 编制</th><td>冠英选型与报价中台（数据版本 ${esc(D.meta.version)}）</td></tr>
+        <tr><th>Items 款号</th><td>${items.map(it => esc(byId.get(it.pid).code)).join(' · ')}</td></tr>
+        <tr><th>Prepared by 编制</th><td>小满童装 · 选款与报价中台（数据版本 ${esc(D.meta.version)}）</td></tr>
       </table>
       <div style="margin-top:14px;font-size:10px;color:#444;line-height:1.7">
-        <b>本资料包包含：</b>封面 · 报价单 · 产品数据页（含图片/编码对照/适配/试验报告）· 装箱与装柜参数 · 免责与确认页。<br>
-        <b>选型依据：</b>车型 / 车桥 / 旧件编码三路校验，每条适配关系标注来源与置信度。<br>
-        <b>重要提示：</b>同一车型可能配不同车桥，若客户未确认车桥，请在发货前核对旧件尺寸或编码（见确认页）。
+        <b>本资料包包含：</b>封面 · 报价单 · 款号数据页（含款图 / 编号对照 / 适穿关系 / 质检报告）· 装箱与装柜参数 · 免责与确认页。<br>
+        <b>选款依据：</b>款式系列 / 尺码段 / 水洗标款号三路校验，每条适穿关系标注来源与置信度。<br>
+        <b>重要提示：</b>同一系列有多个尺码段，若客户未确认身高，请在打样前核对平铺尺寸或水洗标尺码（见确认页）。
       </div>
       <div style="margin-top:20px;font-size:9px;color:#666;border-top:1px solid #ccc;padding-top:6px">
         ${esc(co.name)} ｜ ${esc(co.site)} ｜ ${esc(co.capacity)} ｜ ${esc(co.certs.join(' · '))}
@@ -431,19 +435,19 @@ window.Engine = (function () {
     const rows = items.map(it => {
       const pr = byId.get(it.pid);
       const fs = (fitsByP.get(pr.id) || [])[0];
-      const qs = (fs && fs.q || []).concat(['旧件尺寸（长×宽×厚）是否与资料页一致？', '车桥铭牌/孔数是否已拍照确认？']);
+      const qs = (fs && fs.q || []).concat(['平铺尺寸（胸围 × 衣长）是否与资料页一致？', '水洗标尺码或孩子身高是否已确认？']);
       return `<tr><td><b>${esc(pr.code)}</b></td><td>${qs.slice(0, 3).map(esc).join('<br>')}</td></tr>`;
     }).join('');
     return `<div class="p-page">
       <div class="p-head"><div class="p-logo">${esc(D.meta.company.nameEn)}</div><div class="right" style="font-size:9px">ORDER CONFIRMATION</div></div>
       <div style="font-size:13px;font-weight:700;margin-bottom:6px">发货前确认页 / Pre-shipment confirmation</div>
-      <div style="font-size:10px;color:#444;margin-bottom:8px">为避免「同车型不同车桥」导致的错发，请客户逐项确认。任一项不符，请立即联系我们重新匹配。</div>
-      <table class="p-table"><thead><tr><th style="width:18%">Model</th><th>需客户确认（任一方式即可：车桥铭牌 / 旧件照片带尺 / 旧件编码）</th></tr></thead><tbody>${rows}</tbody></table>
+      <div style="font-size:10px;color:#444;margin-bottom:8px">为避免「同系列不同尺码段」导致的错发，请客户逐项确认。任一项不符，请立即联系我们重新选款。</div>
+      <table class="p-table"><thead><tr><th style="width:18%">Style</th><th>需客户确认（任一方式即可：水洗标尺码 / 孩子身高体重 / 平铺尺寸带尺）</th></tr></thead><tbody>${rows}</tbody></table>
       <div style="margin-top:14px;font-size:10px">
         <div>客户确认人 / Confirmed by：__________________</div>
         <div style="margin-top:12px">日期 / Date：__________________　　签章 / Stamp：</div>
       </div>
-      <div class="p-note">Technical support: 冠英研发部 · 匹配依据存档于选型中台（可追溯到每条适配关系的来源与复核人）。</div>
+      <div class="p-note">Technical support: 小满童装版房 · 选款依据存档于选款中台（可追溯到每条适穿关系的来源与复核人）。</div>
     </div>`;
   }
 
@@ -529,13 +533,13 @@ window.Engine = (function () {
       }
     }
     const calc = quoteCalc(items, customer);
-    const specRows = [['SKU', '型号', '英文名', '类型', '部位', '规格', '材质', '品牌', 'MOQ', '包装', 'HS', '单价USD', '数量']]
+    const specRows = [['SKU', '款号', '英文名', '品类', '版型', '尺码', '面料', '品牌线', 'MOQ', '包装', 'HS', '单价USD', '数量']]
       .concat(calc.rows.map(r => [r.product.sku, r.product.code, r.product.nameEn, r.product.cat, r.product.pos, r.product.dim, r.product.material, r.product.brand, r.product.moq, r.product.pack.per, r.product.hs, r.unit, r.qty]));
-    const codeRows = [['型号', '编码', '编码类型', '来源', '置信度']]
+    const codeRows = [['款号', '编号', '编号类型', '来源', '置信度']]
       .concat(pr.flatMap(p => D.codes.filter(c => c.pid === p.id).map(c => [p.code, c.code, c.type, c.source, c.conf])));
-    const fitRows = [['型号', '车型', '车桥', '部位', '适配类型', '置信度', '来源']]
+    const fitRows = [['款号', '款式系列', '尺码段', '版型', '适穿类型', '置信度', '来源']]
       .concat(pr.flatMap(p => (fitsByP.get(p.id) || []).map(f => [p.code, f.vName, f.aName, f.pos, f.fit, f.conf, f.src])));
-    const readme = `冠英 · 产品与报价资料包\n编号：${no}\n客户：${customer.name}（${customer.country}）\n日期：${date}\n\n文件说明：\n1) 报价单.html       —— 可直接打开/打印为 PDF\n2) 产品规格.csv      —— 型号、规格、材质、包装、单价\n3) 编码对照.csv      —— 型号与 OE/WVA/工厂码/客户叫法的对应关系\n4) 适配关系.csv      —— 车型/车桥与型号的对应关系（含置信度与来源）\n5) 产品数据页.html   —— 含图片、编码对照、适配与试验报告摘要（打印为 PDF 用）\n\n重要提示：同一车型可能配多种车桥。发货前请客户确认车桥铭牌、旧件照片（带尺）或旧件编码任一即可。\n技术支持：${D.meta.company.name} 研发部\n`;
+    const readme = `小满童装 · 款式与报价资料包\n编号：${no}\n客户：${customer.name}（${customer.country}）\n日期：${date}\n\n文件说明：\n1) 报价单.html       —— 可直接打开/打印为 PDF\n2) 款式规格.csv      —— 款号、尺码、面料、包装、单价\n3) 编号对照.csv      —— 款号与条码/客户款号/旧款号/平台款号的对应关系\n4) 适穿关系.csv      —— 款式系列/尺码段与款号的对应关系（含置信度与来源）\n5) 款号数据页.html   —— 含款图、编号对照、适穿与质检报告摘要（打印为 PDF 用）\n\n重要提示：同一系列有多个尺码段。打样前请客户确认水洗标尺码、孩子身高体重或平铺尺寸任一即可。\n技术支持：${D.meta.company.name} 版房\n`;
     const qHtml = `<!doctype html><meta charset="utf-8"><title>报价单 ${no}</title>
 <style>body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;margin:28px;color:#111}
 table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}th,td{border:1px solid #bbb;padding:6px 8px}
@@ -545,13 +549,13 @@ th{background:#f2f2f2;text-align:left}h1{font-size:18px;margin:0}small{color:#66
 <h2>QUOTATION ${esc(no)} · ${esc(date)}</h2>
 <p><b>TO：</b>${esc(customer.name)}（${esc(customer.country)} · ${esc(customer.type)}）<br>
 <b>Incoterm：</b>${esc(customer.incoterm)} ｜ <b>Payment：</b>${esc(customer.pay)} ｜ <b>Currency：</b>USD</p>
-<table><thead><tr><th>#</th><th>Model 型号</th><th>Type 类型</th><th>Size 规格</th><th class="right">Qty</th><th class="right">Unit</th><th class="right">Amount</th></tr></thead>
+<table><thead><tr><th>#</th><th>Style 款号</th><th>Category 品类</th><th>Size 尺码</th><th class="right">Qty</th><th class="right">Unit</th><th class="right">Amount</th></tr></thead>
 <tbody>${calc.rows.map((r, i) => `<tr><td>${i + 1}</td><td><b>${esc(r.product.code)}</b><br><small>${esc(r.product.nameEn.slice(0, 60))}</small></td><td>${esc(r.product.cat)}</td><td>${esc(r.product.dim || '—')}</td><td class="right">${r.qty}</td><td class="right">${money(r.unit)}</td><td class="right">${money(r.amt)}</td></tr>`).join('')}</tbody>
 <tfoot><tr><td colspan="6" class="right"><b>Goods subtotal</b></td><td class="right"><b>${money(calc.amount)}</b></td></tr>
 <tr><td colspan="6" class="right">Freight (est.)</td><td class="right">${money(calc.freight)}</td></tr>
 <tr><td colspan="6" class="right"><b>TOTAL USD</b></td><td class="right"><b>${money(calc.total)}</b></td></tr></tfoot></table>
 <p><small>Validity 30 days · Lead time 25–35 days after deposit · Data version ${esc(D.meta.version)}</small></p>`;
-    const pHtml = `<!doctype html><meta charset="utf-8"><title>产品数据页</title>
+    const pHtml = `<!doctype html><meta charset="utf-8"><title>款号数据页</title>
 <style>body{font-family:"Segoe UI","Microsoft YaHei",sans-serif;margin:24px;color:#111}
 .p{page-break-after:always;margin-bottom:20px}table{width:100%;border-collapse:collapse;font-size:11px}
 th,td{border:1px solid #bbb;padding:4px 6px}th{background:#f2f2f2;text-align:left}h2{font-size:16px;margin:0 0 6px}
@@ -570,8 +574,8 @@ ${ts.length ? `<table style="margin-top:6px"><tr><th>Standard</th><th>Item</th><
       ...imgFiles,
       { name: 'README.txt', data: readme },
       { name: '报价单.html', data: qHtml },
-      { name: '产品数据页.html', data: pHtml },
-      { name: '产品规格.csv', data: '\ufeff' + csv(specRows) },
+      { name: '款号数据页.html', data: pHtml },
+      { name: '款式规格.csv', data: '\ufeff' + csv(specRows) },
       { name: '编码对照.csv', data: '\ufeff' + csv(codeRows) },
       { name: '适配关系.csv', data: '\ufeff' + csv(fitRows) }
     ];

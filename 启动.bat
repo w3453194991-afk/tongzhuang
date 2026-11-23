@@ -4,10 +4,11 @@ setlocal
 cd /d "%~dp0"
 set "PORT=8765"
 set "URL=http://127.0.0.1:%PORT%/index.html"
-title 冠英 · 选型与报价中台
+title 小满童装 · 选款与报价中台
 
 echo.
-echo   冠英 · 选型与报价中台
+echo   小满童装 · 选款与报价中台
+echo   XIAOMAN KIDS · 款式 / 尺码 / 报价 / 资料包
 echo   ----------------------------------------
 
 rem 1) 服务已经在跑：直接开页面

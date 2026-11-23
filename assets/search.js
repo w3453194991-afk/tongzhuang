@@ -5,189 +5,195 @@
 
   /* ---------------- 市场 / 本地语言 ---------------- */
   const MARKETS = [
-    { id: 'mx', name: '墨西哥', dom: '.mx', lang: 'es', city: 'Ciudad de México', terms: { pad: 'pastillas de freno', lining: 'forros de freno', shop: 'taller de frenos' } },
-    { id: 'br', name: '巴西', dom: '.br', lang: 'pt', city: 'São Paulo', terms: { pad: 'pastilha de freio', lining: 'lona de freio', shop: 'oficina de freios' } },
-    { id: 'cl', name: '智利', dom: '.cl', lang: 'es', city: 'Santiago', terms: { pad: 'pastillas de freno', lining: 'forros de freno', shop: 'taller de frenos' } },
-    { id: 'ae', name: '阿联酋', dom: '.ae', lang: 'en', city: 'Dubai', terms: { pad: 'brake pads', lining: 'brake lining', shop: 'truck brake service' } },
-    { id: 'sa', name: '沙特', dom: '.sa', lang: 'ar', city: 'Riyadh', terms: { pad: 'فحمات فرامل', lining: 'بطانة فرامل', shop: 'ورشة فرامل' } },
-    { id: 'eg', name: '埃及', dom: '.eg', lang: 'ar', city: 'Cairo', terms: { pad: 'فحمات فرامل', lining: 'بطانة فرامل', shop: 'ورشة فرامل' } },
-    { id: 'za', name: '南非', dom: '.za', lang: 'en', city: 'Johannesburg', terms: { pad: 'brake pads', lining: 'brake lining', shop: 'truck brake service' } },
-    { id: 'ru', name: '俄罗斯', dom: '.ru', lang: 'ru', city: 'Москва', terms: { pad: 'тормозные колодки', lining: 'тормозные накладки', shop: 'ремонт тормозов грузовик' } },
-    { id: 'tr', name: '土耳其', dom: '.tr', lang: 'tr', city: 'İstanbul', terms: { pad: 'fren balatası', lining: 'fren balata', shop: 'kamyon fren servisi' } },
-    { id: 'id', name: '印尼', dom: '.co.id', lang: 'id', city: 'Jakarta', terms: { pad: 'kampas rem', lining: 'kampas rem tromol', shop: 'servis rem truk' } },
-    { id: 'vn', name: '越南', dom: '.vn', lang: 'vi', city: 'Hồ Chí Minh', terms: { pad: 'má phanh', lining: 'má phanh tang trống', shop: 'sửa phanh xe tải' } },
-    { id: 'global', name: '全球（英文）', dom: '', lang: 'en', city: '', terms: { pad: 'brake pads', lining: 'brake lining', shop: 'truck brake service' } }
+    { id: 'mx', name: '墨西哥', dom: '.mx', lang: 'es', city: 'Ciudad de México', terms: { cat: 'ropa infantil', cat2: 'vestidos de niña', shop: 'tienda de ropa infantil' } },
+    { id: 'br', name: '巴西', dom: '.br', lang: 'pt', city: 'São Paulo', terms: { cat: 'roupa infantil', cat2: 'vestidos infantis', shop: 'loja de roupa infantil' } },
+    { id: 'cl', name: '智利', dom: '.cl', lang: 'es', city: 'Santiago', terms: { cat: 'ropa infantil', cat2: 'vestidos de niña', shop: 'tienda de ropa infantil' } },
+    { id: 'ae', name: '阿联酋', dom: '.ae', lang: 'en', city: 'Dubai', terms: { cat: 'kids clothing', cat2: 'kids dresses', shop: 'kids boutique' } },
+    { id: 'sa', name: '沙特', dom: '.sa', lang: 'ar', city: 'Riyadh', terms: { cat: 'ملابس أطفال', cat2: 'فساتين أطفال', shop: 'متجر ملابس أطفال' } },
+    { id: 'eg', name: '埃及', dom: '.eg', lang: 'ar', city: 'Cairo', terms: { cat: 'ملابس أطفال', cat2: 'فساتين أطفال', shop: 'متجر ملابس أطفال' } },
+    { id: 'za', name: '南非', dom: '.za', lang: 'en', city: 'Johannesburg', terms: { cat: 'kids clothing', cat2: 'kids dresses', shop: 'kids clothing shop' } },
+    { id: 'ru', name: '俄罗斯', dom: '.ru', lang: 'ru', city: 'Москва', terms: { cat: 'детская одежда', cat2: 'детские платья', shop: 'детский магазин одежды' } },
+    { id: 'tr', name: '土耳其', dom: '.tr', lang: 'tr', city: 'İstanbul', terms: { cat: 'çocuk giyim', cat2: 'çocuk elbise', shop: 'çocuk giyim mağazası' } },
+    { id: 'id', name: '印尼', dom: '.co.id', lang: 'id', city: 'Jakarta', terms: { cat: 'baju anak', cat2: 'gaun anak', shop: 'toko baju anak' } },
+    { id: 'vn', name: '越南', dom: '.vn', lang: 'vi', city: 'Hồ Chí Minh', terms: { cat: 'quần áo trẻ em', cat2: 'váy trẻ em', shop: 'cửa hàng quần áo trẻ em' } },
+    { id: 'cn', name: '国内（中文）', dom: '.cn', lang: 'zh', city: '杭州', terms: { cat: '童装', cat2: '童装连衣裙', shop: '母婴店' } },
+    { id: 'global', name: '全球（英文）', dom: '', lang: 'en', city: '', terms: { cat: 'kids clothing', cat2: 'kids dresses', shop: 'kids boutique' } }
   ];
 
   const TYPES = {
-    distributor: { en: 'distributor', zh: '经销商', local: { es: 'distribuidor', pt: 'distribuidor', ar: 'موزع', ru: 'дистрибьютор', tr: 'distribütör', id: 'distributor', vi: 'nhà phân phối', en: 'distributor' } },
-    importer: { en: 'importer', zh: '进口商', local: { es: 'importador', pt: 'importador', ar: 'مستورد', ru: 'импортёр', tr: 'ithalatçı', id: 'importir', vi: 'nhà nhập khẩu', en: 'importer' } },
-    wholesaler: { en: 'wholesaler', zh: '批发商', local: { es: 'mayorista', pt: 'atacadista', ar: 'تاجر جملة', ru: 'оптовик', tr: 'toptancı', id: 'grosir', vi: 'bán buôn', en: 'wholesaler' } },
-    fleet: { en: 'fleet', zh: '车队', local: { es: 'flotilla', pt: 'frota', ar: 'أسطول', ru: 'автопарк', tr: 'filo', id: 'armada truk', vi: 'đội xe', en: 'fleet' } },
-    workshop: { en: 'workshop', zh: '修理厂', local: { es: 'taller', pt: 'oficina', ar: 'ورشة', ru: 'СТО', tr: 'servis', id: 'bengkel', vi: 'xưởng', en: 'workshop' } }
+    distributor: { en: 'kids clothing distributor', zh: '经销商', local: { es: 'distribuidor de ropa infantil', pt: 'distribuidor de roupa infantil', ar: 'موزع ملابس أطفال', ru: 'дистрибьютор детской одежды', tr: 'çocuk giyim distribütörü', id: 'distributor baju anak', vi: 'nhà phân phối quần áo trẻ em', zh: '童装经销商', en: 'kids clothing distributor' } },
+    importer: { en: 'kids wear importer', zh: '进口商', local: { es: 'importador de ropa infantil', pt: 'importador de roupa infantil', ar: 'مستورد ملابس أطفال', ru: 'импортёр детской одежды', tr: 'çocuk giyim ithalatçısı', id: 'importir baju anak', vi: 'nhà nhập khẩu quần áo trẻ em', zh: '童装进口商', en: 'kids wear importer' } },
+    wholesaler: { en: 'kids clothing wholesaler', zh: '批发商', local: { es: 'mayorista de ropa infantil', pt: 'atacadista de roupa infantil', ar: 'تاجر جملة ملابس أطفال', ru: 'оптовик детской одежды', tr: 'çocuk giyim toptancısı', id: 'grosir baju anak', vi: 'bán buôn quần áo trẻ em', zh: '童装批发商', en: 'kids clothing wholesaler' } },
+    boutique: { en: 'kids boutique', zh: '童装买手店', local: { es: 'boutique infantil', pt: 'loja de roupa infantil', ar: 'بوتيك أطفال', ru: 'детский бутик', tr: 'çocuk butik', id: 'butik baju anak', vi: 'shop thời trang trẻ em', zh: '童装买手店', en: 'kids boutique' } },
+    chain: { en: 'kids retail chain', zh: '母婴连锁', local: { es: 'cadena de tiendas infantiles', pt: 'rede de lojas infantis', ar: 'سلسلة متاجر أطفال', ru: 'сеть детских магазинов', tr: 'çocuk mağaza zinciri', id: 'jaringan toko anak', vi: 'chuỗi cửa hàng trẻ em', zh: '母婴连锁', en: 'kids retail chain' } },
+    ecom: { en: 'kids wear e-commerce seller', zh: '童装电商', local: { es: 'tienda online de ropa infantil', pt: 'loja online de roupa infantil', ar: 'متجر إلكتروني لملابس أطفال', ru: 'интернет-магазин детской одежды', tr: 'çocuk giyim e-ticaret', id: 'toko online baju anak', vi: 'shop online quần áo trẻ em', zh: '童装电商', en: 'kids wear e-commerce seller' } }
   };
 
   const PRODUCTS = {
-    pad: { zh: '盘式刹车片', en: 'brake pads', cat: '盘式刹车片' },
-    lining: { zh: '鼓式衬片', en: 'brake lining', cat: '鼓式衬片' },
-    shoe: { zh: '制动蹄总成', en: 'brake shoe assembly', cat: '制动蹄总成' },
-    wind: { zh: '风电刹车片', en: 'wind turbine brake pad', cat: '风电刹车片' }
+    dress: { zh: '连衣裙', en: 'kids dresses', cat: '连衣裙' },
+    hoodie: { zh: '卫衣', en: 'kids sweatshirts', cat: '卫衣' },
+    tee: { zh: 'T恤', en: 'kids t-shirts', cat: 'T恤' },
+    jacket: { zh: '外套', en: 'kids jackets', cat: '外套' },
+    pants: { zh: '裤装', en: 'kids pants', cat: '裤装' },
+    set: { zh: '套装', en: 'kids clothing sets', cat: '套装' },
+    homewear: { zh: '家居服', en: 'kids pajamas', cat: '家居服' },
+    romper: { zh: '连体衣', en: 'baby rompers', cat: '连体衣' }
   };
 
   const NARROW = {
     none: { zh: '不加收窄', suffix: '' },
     site: { zh: '只搜本国域名 site:', suffix: 'SITE' },
-    intitle: { zh: '标题含 fleet/brake', suffix: 'INTITLE' },
-    inurl: { zh: 'URL 含 dealer/contact', suffix: 'INURL' },
-    pdf: { zh: '只要 PDF 目录', suffix: 'PDF' }
+    intitle: { zh: '标题含 wholesale / buyer', suffix: 'INTITLE' },
+    inurl: { zh: 'URL 含 boutique / contact', suffix: 'INURL' },
+    pdf: { zh: '只要 PDF 目录 / line sheet', suffix: 'PDF' }
   };
 
   let current = [];
-  let opts = { market: 'mx', type: 'distributor', prod: 'pad', narrow: 'none', excl: '-trading -alibaba -marketplace' };
+  let opts = { market: 'mx', type: 'distributor', prod: 'dress', narrow: 'none', excl: '-alibaba -made-in-china -marketplace -dropship' };
 
   /* ---------------- 预设库（按区域、含 Google 长版 / DDG 短版） ---------------- */
   const PRESET_REGIONS = [
     {
       k: 'sea', label: '东南亚 SEA',
-      langs: 'en / kampas rem（印尼）/ má phanh（越南）/ pha brek（泰语转写）',
+      langs: 'en / baju anak（印尼）/ quần áo trẻ em（越南）/ เสื้อผ้าเด็ก（泰语）',
       chan: 'Facebook / WhatsApp / Zalo / LINE',
-      note: '时差小，漏单主因是刷屏淹没',
+      note: '时差小，漏单主因是刷屏淹没；泰国、印尼买家多在 Facebook 群组里问价',
       rows: [
         {
-          tag: '刹车片 · 车队修理厂 · 泰国',
-          google: 'SEA "brake pads" fleet workshop TH -"alibaba" -"made-in-china" -marketplace' , g2: '"brake pads" (fleet OR workshop OR garage) Bangkok filetype:pdf OR contact',
-          ddg: '"brake pads" fleet workshop TH -alibaba'
+          tag: '童装 · 批发商 · 泰国',
+          google: '"kids clothing" ("wholesaler" OR "distributor") site:.th "90-160cm" -alibaba -made-in-china -marketplace', g2: '"kids clothing" (wholesale OR distributor) Bangkok contact filetype:pdf OR "line sheet" "2T-12Y"',
+          ddg: '"kids clothing" wholesale Thailand -alibaba'
         },
         {
-          tag: '鼓式衬片 · 卡车制动服务 · 泰国',
-          google: 'SEA "brake lining" truck brake service TH -"alibaba" -"made-in-china" -marketplace', g2: '"brake lining" (fleet OR workshop OR garage) Bangkok filetype:pdf OR contact',
-          ddg: '"brake lining" truck brake service TH -alibaba'
+          tag: '女童连衣裙 · 童装买手店 · 泰国',
+          google: '"kids dresses" ("boutique" OR "buyer") site:.th "2T-12Y" -alibaba -made-in-china', g2: '"kids dress" (boutique OR buyer) Bangkok contact filetype:pdf',
+          ddg: '"kids dress" boutique Thailand -alibaba'
         }
       ]
     },
     {
       k: 'me', label: '中东 ME',
-      langs: 'en / ar（阿语）/ fren balata（土耳其）',
-      chan: 'WhatsApp / LinkedIn',
-      note: '迪拜是转口集散地，满屏贸易公司最典型',
+      langs: 'en / ar（阿语）/ çocuk giyim（土耳其）',
+      chan: 'WhatsApp / LinkedIn / 展会名录',
+      note: '迪拜是转口集散地，满屏贸易公司最典型；先看有没有门店与品牌授权',
       rows: [
         {
-          tag: '重卡刹车片 · 车队维保 · 阿联酋',
-          google: 'ME "heavy duty brake pads" fleet maintenance AE -"alibaba" -"made-in-china" -marketplace', g2: '"heavy duty brake pads" (fleet OR workshop OR garage) Dubai filetype:pdf OR contact',
-          ddg: '"heavy duty brake pads" fleet maintenance AE -alibaba'
+          tag: '童装批发 · 进口商 · 阿联酋',
+          google: '"kids clothing" ("importer" OR "wholesaler") site:.ae "90-160cm" -alibaba -made-in-china -marketplace', g2: '"kids clothing" importer Dubai contact filetype:pdf OR "line sheet"',
+          ddg: '"kids clothing" importer Dubai -alibaba'
         },
         {
-          tag: '鼓式衬片 · 卡车修理厂 · 阿联酋',
-          google: 'ME "brake lining" truck workshop AE -"alibaba" -"made-in-china" -marketplace', g2: '"brake lining" (fleet OR workshop OR garage) Dubai filetype:pdf OR contact',
-          ddg: '"brake lining" truck workshop AE -alibaba'
+          tag: '童装买手店 · 买手 · 沙特',
+          google: '"kids boutique" ("buyer" OR "multi-brand") site:.sa "2T-12Y" -alibaba -made-in-china', g2: '"children wear" boutique buyer Riyadh contact filetype:pdf',
+          ddg: '"kids boutique" buyer Saudi -alibaba'
         }
       ]
     },
     {
       k: 'sa', label: '南美 SA',
-      langs: 'pastilha de freio（葡）/ pastillas / balatas de freno（西）/ lonas de freno',
+      langs: 'pt（português）/ es（español）· roupa infantil / ropa infantil',
       chan: 'WhatsApp（绝对主渠道）',
-      note: '时差最大，夜间询盘必漏',
+      note: '时差最大，夜间询盘必漏；巴西买家习惯先要 WhatsApp 目录',
       rows: [
         {
-          tag: '刹车片 · 车队 · 巴西',
-          google: 'SA "pastilha de freio" frota BR -"alibaba" -"made-in-china" -marketplace', g2: '"pastilha de freio" (fleet OR workshop OR garage) Sao Paulo filetype:pdf OR contact',
-          ddg: '"pastilha de freio" frota BR -alibaba'
+          tag: '童装批发 · 批发商 · 巴西',
+          google: '"roupa infantil" ("atacado" OR "distribuidor") site:.br "90-160cm" -alibaba -made-in-china -marketplace', g2: '"roupa infantil" atacado São Paulo contato filetype:pdf',
+          ddg: '"roupa infantil" atacado Brasil -alibaba'
         },
         {
-          tag: '刹车片 · 修理厂 · 巴西',
-          google: 'SA "pastillas de freno" oficina BR -"alibaba" -"made-in-china" -marketplace', g2: '"pastillas de freno" (fleet OR workshop OR garage) Sao Paulo filetype:pdf OR contact',
-          ddg: '"pastillas de freno" oficina BR -alibaba'
+          tag: '女童连衣裙 · 买手店 · 智利',
+          google: '"vestidos de niña" ("boutique" OR "mayorista") site:.cl "2T-12Y" -alibaba -made-in-china', g2: '"vestidos de niña" boutique Santiago contacto filetype:pdf',
+          ddg: '"vestidos de niña" boutique Chile -alibaba'
         }
       ]
     },
     {
       k: 'na', label: '北美 NA',
-      langs: 'en / FMSI D 编号是通用语言',
-      chan: 'LinkedIn / 电话 / 邮件',
-      note: '提单相对可用，但准入认证更严',
+      langs: 'en / "2T-12Y" 是通用尺码语言',
+      chan: 'LinkedIn / 邮件 / 展会（NY NOW / Children\'s Club）',
+      note: '用条码与尺码表对话；Amazon 卖家比传统进口商更活跃，准入更看 CPSIA',
       rows: [
         {
-          tag: '重卡刹车片 · 车队维保 · 美国',
-          google: 'NA "heavy duty brake pads" fleet maintenance US -"alibaba" -"made-in-china" -marketplace', g2: '"heavy duty brake pads" (fleet OR workshop OR garage) Dallas filetype:pdf OR contact',
-          ddg: '"heavy duty brake pads" fleet maintenance US -alibaba'
+          tag: '童装 · 进口商 / 分销商 · 美国',
+          google: '"kids clothing" ("importer" OR "distributor") site:.us "2T-12Y" -alibaba -made-in-china -marketplace', g2: '"kids clothing" importer OR distributor USA "size 2T-12Y" filetype:pdf OR contact',
+          ddg: '"kids clothing" importer distributor USA -alibaba'
         },
         {
-          tag: 'FMSI D1369 · 卡车修理厂 · 美国',
-          google: 'NA "FMSI D1369" truck repair shop US -"alibaba" -"made-in-china" -marketplace', g2: '"FMSI D1369" (fleet OR workshop OR garage) Dallas filetype:pdf OR contact',
-          ddg: '"FMSI D1369" truck repair shop US -alibaba'
+          tag: '童装买手店 · 买手邮箱 · 美国',
+          google: 'site:linkedin.com "kids apparel" buyer ("boutique" OR "sourcing") "childrenswear"', g2: 'children wear boutique buyer email USA "2T-12Y" contact filetype:pdf',
+          ddg: 'children wear boutique buyer email -alibaba'
         }
       ]
     },
     {
       k: 'eu', label: '欧洲 EU',
-      langs: 'en / WVA 29087 / 29108 / Bremsbeläge（德）',
-      chan: '邮件 / LinkedIn / 展会',
-      note: 'WVA 编号是通用语言',
+      langs: 'en / de（Kinderbekleidung）/ pl（odzież dziecięca）',
+      chan: '邮件 / LinkedIn / 展会（Playtime / CIFF）',
+      note: '欧洲先问 OEKO-TEX 100 与 REACH，再谈价；买手店占比高',
       rows: [
         {
-          tag: 'WVA 29087 · 车队修理厂 · 波兰',
-          google: 'EU "WVA 29087" fleet workshop PL -"alibaba" -"made-in-china" -marketplace', g2: '"WVA 29087" (fleet OR workshop OR garage) Warsaw filetype:pdf OR contact',
-          ddg: '"WVA 29087" fleet workshop PL -alibaba'
+          tag: '童装批发 · 经销商 · 波兰',
+          google: '"odzież dziecięca" ("hurt" OR "dystrybutor") site:.pl "90-160cm" -alibaba -made-in-china -marketplace', g2: '"odzież dziecięca" hurt Warszawa kontakt filetype:pdf',
+          ddg: '"odzież dziecięca" hurt Polska -alibaba'
         },
         {
-          tag: 'WVA 29108 · 经销商 · 波兰',
-          google: 'EU "WVA 29108" distributor PL -"alibaba" -"made-in-china" -marketplace', g2: '"WVA 29108" (fleet OR workshop OR garage) Warsaw filetype:pdf OR contact',
-          ddg: '"WVA 29108" distributor PL -alibaba'
+          tag: '童装 · 买手 · 德国',
+          google: 'site:linkedin.com "kids apparel" buyer ("Kinderbekleidung" OR "childrenswear") Germany', g2: '"Kinderbekleidung" ("Großhandel" OR "Einkauf") Berlin kontakt filetype:pdf',
+          ddg: '"Kinderbekleidung" Großhandel Berlin -alibaba'
         }
       ]
     },
     {
       k: 'sas', label: '南亚 SAS',
-      langs: 'en / hi（印地）/ ur（乌尔都）· ब्रेक पैड / بریک لائننگ',
+      langs: 'en / hi（बच्चों के कपड़े）/ ur · بچوں کے کپڑے',
       chan: 'WhatsApp / IndiaMART / 电话',
-      note: '价格极敏感，先问 AIS 认证；巴基斯坦多做转口',
+      note: '价格极敏感，先问 GOTS / OEKO-TEX；斋浦尔与德里是童装集散地',
       rows: [
         {
-          tag: '重卡刹车片 · 车队修理厂 · 印度',
-          google: 'SAS "heavy duty brake pads" fleet workshop IN -"alibaba" -"made-in-china" -marketplace', g2: '"heavy duty brake pads" (fleet OR workshop OR garage) Mumbai filetype:pdf OR contact',
-          ddg: '"heavy duty brake pads" fleet workshop IN -alibaba'
+          tag: '童装批发 · 批发商 · 印度',
+          google: '"kids clothing" ("wholesaler" OR "distributor") site:.in "90-160cm" -alibaba -made-in-china -marketplace', g2: '"kids clothing" wholesale Delhi contact filetype:pdf OR "line sheet"',
+          ddg: '"kids clothing" wholesale India -alibaba'
         },
         {
-          tag: '鼓式衬片 · 经销商 · 印度',
-          google: 'SAS "brake lining" distributor IN -"alibaba" -"made-in-china" -marketplace', g2: '"brake lining" (distributor OR dealer OR wholesaler) Delhi filetype:pdf OR contact',
-          ddg: '"brake lining" distributor IN -alibaba'
+          tag: '女童连衣裙 · 出口商 · 印度',
+          google: '"girls dresses" ("exporter" OR "buyer") site:.in "2T-12Y" -alibaba -made-in-china', g2: '"girls dress" exporter Jaipur contact filetype:pdf',
+          ddg: '"girls dress" exporter India -alibaba'
         }
       ]
     },
     {
       k: 'ru', label: '俄语区 RU',
-      langs: 'ru（тормозные колодки / накладки）/ en · 哈语多走俄语',
+      langs: 'ru（детская одежда оптом）/ en · 哈语多走俄语',
       chan: 'WhatsApp / Telegram / 邮件',
-      note: '本地化要求高（EAC 认证），哈萨克多做转口与矿山车队',
+      note: '本地化要求高（EAC 认证），哈萨克多做转口',
       rows: [
         {
-          tag: '刹车片 · 车队修理厂 · 俄罗斯',
-          google: 'RU "тормозные колодки" автопарк СТО RU -"alibaba" -"made-in-china" -marketplace', g2: '"тормозные колодки" (автопарк OR СТО OR сервис) Москва filetype:pdf OR contact',
-          ddg: '"тормозные колодки" автопарк СТО RU -alibaba'
+          tag: '童装批发 · 批发商 · 俄罗斯',
+          google: '"детская одежда" ("оптом" OR "дистрибьютор") site:.ru "90-160" -alibaba -made-in-china -marketplace', g2: '"детская одежда" оптом Москва контакты filetype:pdf',
+          ddg: '"детская одежда" оптом Россия -alibaba'
         },
         {
-          tag: '鼓式衬片 · 矿山车队 · 哈萨克斯坦',
-          google: 'RU "тормозные накладки" автопарк KZ -"alibaba" -"made-in-china" -marketplace', g2: '"тормозные накладки" (автопарк OR карьер OR сервис) Алматы filetype:pdf OR contact',
-          ddg: '"тормозные накладки" автопарк KZ -alibaba'
+          tag: '童装 · 多品牌店 · 哈萨克斯坦',
+          google: '"детская одежда" ("мультибренд" OR "бутик") site:.kz "2T-12Y" -alibaba -made-in-china', g2: '"детская одежда" бутик Алматы контакты filetype:pdf',
+          ddg: '"детская одежда" бутик Казахстан -alibaba'
         }
       ]
     },
     {
       k: 'af', label: '非洲 AF',
-      langs: 'en / fr（部分）',
+      langs: 'en / fr（vêtements enfants）',
       chan: 'WhatsApp / Facebook',
-      note: '矿山与港口车队集中',
+      note: '拉各斯与约翰内斯堡是集散地，先看现货与拼柜',
       rows: [
         {
-          tag: '卡车刹车片 · 车队修理厂 · 南非',
-          google: 'AF "truck brake pads" fleet workshop ZA -"alibaba" -"made-in-china" -marketplace', g2: '"truck brake pads" (fleet OR workshop OR garage) Johannesburg filetype:pdf OR contact',
-          ddg: '"truck brake pads" fleet workshop ZA -alibaba'
+          tag: '童装批发 · 批发商 · 南非',
+          google: '"kids clothing" ("wholesaler" OR "distributor") site:.za "90-160cm" -alibaba -made-in-china -marketplace', g2: '"kids clothing" wholesale Johannesburg contact filetype:pdf',
+          ddg: '"kids clothing" wholesale Johannesburg -alibaba'
         },
         {
-          tag: '鼓式衬片 · 矿山车队 · 南非',
-          google: 'AF "brake lining" mining fleet ZA -"alibaba" -"made-in-china" -marketplace', g2: '"brake lining" (fleet OR workshop OR garage) Johannesburg filetype:pdf OR contact',
-          ddg: '"brake lining" mining fleet ZA -alibaba'
+          tag: '婴童连体衣 · 母婴店 · 尼日利亚',
+          google: '"baby clothes" ("baby shop" OR "importer") site:.ng "0-24M" -alibaba -made-in-china', g2: '"baby clothes" baby shop Lagos contact filetype:pdf',
+          ddg: '"baby clothes" baby shop Lagos -alibaba'
         }
       ]
     }
@@ -243,59 +249,71 @@
 
   function marketById(id) { return MARKETS.find(m => m.id === id) || MARKETS[0]; }
 
-  /* WVA / FMSI 号：从目录里挑真号 */
-  function pickCodes() {
-    const ps = DB().products;
-    const wva = ps.filter(p => /^29\d{3}$/.test(p.code)).slice(0, 2).map(p => p.code);
-    const fmsi = ps.filter(p => /^(D\d{3,4}|\d{4}[A-Z]{0,2})$/.test(p.code) && p.cat === '鼓式衬片').slice(0, 2).map(p => p.code);
-    return { wva: wva.length ? wva : ['29087', '29108'], fmsi: fmsi.length ? fmsi : ['4709', '4515'] };
+  /* 款号 / 条码：从目录里挑真号 */
+  function pickCodes(cat) {
+    const ps = DB().products || [];
+    const ofCat = ps.filter(p => p.cat === cat);
+    const style = ofCat.slice(0, 2).map(p => p.code);
+    const ean = [];
+    const takeEan = list => list.forEach(p => (p.altCodes || []).forEach(c => { if (/^\d{13}$/.test(c) && ean.length < 2) ean.push(c); }));
+    takeEan(ofCat);
+    if (ean.length < 2) takeEan(ps);
+    return { style: style.length ? style : ['DR2601001', 'SW2601047'], ean: ean.length ? ean : ['6972026112300', '6972026112332'] };
   }
 
   function build(o) {
     const m = marketById(o.market);
     const t = TYPES[o.type] || TYPES.distributor;
-    const p = PRODUCTS[o.prod] || PRODUCTS.pad;
+    const p = PRODUCTS[o.prod] || PRODUCTS.dress;
     const local = t.local[m.lang] || t.en;
-    const padLocal = m.terms.pad, liningLocal = m.terms.lining, shopLocal = m.terms.shop;
+    const impLocal = TYPES.importer.local[m.lang] || 'importer';
+    const wholeLocal = TYPES.wholesaler.local[m.lang] || 'wholesaler';
+    const catLocal = (o.prod === 'dress' && m.lang !== 'en') ? m.terms.cat2 : m.terms.cat, shopLocal = m.terms.shop;
     const site = m.dom ? 'site:' + m.dom + ' ' : '';
     const excl = (o.excl || '').trim();
     const q = [];
 
     /* 1 组合公式 */
-    let s1 = `"${m.lang === 'en' ? p.en : (o.prod === 'lining' ? liningLocal : padLocal)}" (${local} OR ${TYPES.importer.local[m.lang] || 'importer'} OR ${TYPES.wholesaler.local[m.lang] || 'wholesaler'})`;
+    const zh = m.lang === 'zh';
+    const pick = arr => arr.filter((v, i, a) => a.indexOf(v) === i);
+    const catTerms = pick(zh ? [catLocal] : [catLocal, p.en]).map(v => `"${v}"`).join(' OR ');
+    const typeTerms = pick([local, impLocal, wholeLocal]).map(v => `"${v}"`).join(' OR ');
+    const sizeTerms = zh ? '("90-160" OR "110码" OR "2T-12Y")' : '("90-160cm" OR "2T-12Y" OR "110/4T")';
+    let s1 = `(${catTerms}) (${typeTerms}) ${sizeTerms}`;
     if (site) s1 = site + s1;
     if (o.narrow === 'pdf') s1 += ' filetype:pdf';
-    if (o.narrow === 'intitle') s1 = `intitle:${t.en} ` + s1;
-    if (o.narrow === 'inurl') s1 += ' inurl:dealer';
-    q.push({ k: '组合公式', tip: '产品词 + 客户类型 + 国家域名，最通用的一条', text: (s1 + ' ' + excl).trim() });
+    if (o.narrow === 'intitle') s1 = `intitle:"${t.en}" ` + s1;
+    if (o.narrow === 'inurl') s1 += ' inurl:boutique';
+    q.push({ k: '组合公式', tip: '品类词 + 客户类型 + 国家域名 + 尺码段，最通用的一条', text: (s1 + ' ' + excl).trim() });
 
-    /* 2 行业编号式 */
-    const codes = pickCodes();
+    /* 2 款号 / 条码 */
+    const codes = pickCodes(p.cat);
     q.push({
-      k: '行业编号（WVA）', tip: '客户手里只有通用号时，用这个号去搜',
-      text: `("WVA ${codes.wva[0]}" OR "WVA ${codes.wva[1]}") (catalogue OR supplier OR "cross reference") ${excl}`.trim()
+      k: '款号（自家款号）', tip: '客户手里只有吊牌或水洗标时，用款号去搜同款与目录',
+      text: `("${codes.style[0]}" OR "${codes.style[1]}") ${zh ? '(目录 OR 画册 OR 批发)' : '(catalogue OR "line sheet" OR wholesale)'} ${excl}`.trim()
     });
     q.push({
-      k: '行业编号（FMSI）', tip: '北美/鼓式用形状码，常出现在 PDF 目录里',
-      text: `("FMSI ${codes.fmsi[0]}" OR "FMSI ${codes.fmsi[1]}") (catalogue OR cross reference) filetype:pdf`
+      k: '条码（EAN）', tip: '海外买手常用条码找同款，常出现在 PDF 目录与平台链接里',
+      text: `("${codes.ean[0]}" OR "${codes.ean[1]}") ${zh ? '(条码 OR EAN OR 尺码表)' : '(barcode OR EAN OR "size chart")'} filetype:pdf`
     });
 
     /* 3 本地语言 */
     q.push({
-      k: '本地语言（终端）', tip: '终端客户不用英文搜，这条命中修理厂/车队',
-      text: `${site}"${shopLocal}" ("${padLocal}" OR "${liningLocal}") ${excl}`.trim()
+      k: '本地语言（终端）', tip: '终端门店不用英文搜，这条命中童装店与母婴店',
+      text: `${site}"${shopLocal}" (${zh ? `"${catLocal}"` : `"${catLocal}" OR "${p.en}"`}) ${excl}`.trim()
     });
 
-    /* 4 车桥 / 卡钳 */
+    /* 4 尺码段 / 品类 */
+    const sizeCatTerms = pick(zh ? [catLocal] : [p.en, catLocal]).map(v => `"${v}"`).join(' OR ');
     q.push({
-      k: '车桥 / 卡钳', tip: '挂车与商用车是「车桥问题」，不是车标问题',
-      text: `("BPW" OR "SAF-Holland" OR "Meritor" OR "Fuwa") "${p.en}" ("cross reference" OR catalogue) filetype:pdf`
+      k: '尺码段 / 品类', tip: '童装是「尺码段问题」，不是品牌问题；买家按身高段与年龄段找货',
+      text: `${sizeTerms} (${sizeCatTerms}) ${zh ? '(目录 OR 尺码表)' : '(catalogue OR "size chart")'} filetype:pdf`
     });
 
-    /* 5 车队 */
+    /* 5 买手店 / 母婴连锁 */
     q.push({
-      k: '车队 / 维修', tip: '按维保页面找车队，而不是按产品词',
-      text: `intitle:"fleet" ("${p.en}" OR "brake maintenance") ${m.dom ? 'site:' + m.dom : ''} -trading -marketplace`.replace(/\s+/g, ' ').trim()
+      k: '买手店 / 母婴连锁', tip: '按选品页与门店品牌找，而不是按品类词硬搜',
+      text: `intitle:"${zh ? '批发' : 'wholesale'}" (${zh ? `"${catLocal}"` : `"${p.en}" OR "kids boutique"`}) ${m.dom ? 'site:' + m.dom : ''} -alibaba -marketplace`.replace(/\s+/g, ' ').trim()
     });
 
     /* 6 地图 */
@@ -326,7 +344,7 @@
     <div class="row wrap-gap" style="justify-content:space-between;margin-bottom:12px">
       <div>
         <h1 style="margin:0">客户搜索</h1>
-        <div class="muted small">按「产品词 + 客户类型 + 国家」生成检索式，直接投喂 Google / Bing / Yandex / Maps；搜到人一键回填线索。</div>
+        <div class="muted small">按「品类词 + 客户类型 + 国家 + 尺码段」生成检索式，直接投喂 Google / Bing / Yandex / Maps；搜到人一键回填线索。</div>
       </div>
       <button class="btn" data-act="tab" data-id="leads">询盘线索 →</button>
     </div>
@@ -336,10 +354,10 @@
       <div class="card-b">
         <div class="sq-form">
           <label>市场 ${sel('sqMarket', MARKETS.map(x => ({ v: x.id, t: x.name + ' · ' + x.lang + (x.dom ? ' · ' + x.dom : '') })), opts.market)}</label>
-          <label>产品 ${sel('sqProd', Object.keys(PRODUCTS).map(k => ({ v: k, t: PRODUCTS[k].zh + ' / ' + PRODUCTS[k].en })), opts.prod)}</label>
+          <label>品类 ${sel('sqProd', Object.keys(PRODUCTS).map(k => ({ v: k, t: PRODUCTS[k].zh + ' / ' + PRODUCTS[k].en })), opts.prod)}</label>
           <label>客户类型 ${sel('sqType', Object.keys(TYPES).map(k => ({ v: k, t: TYPES[k].zh + ' / ' + TYPES[k].en })), opts.type)}</label>
           <label>收窄 ${sel('sqNarrow', Object.keys(NARROW).map(k => ({ v: k, t: NARROW[k].zh })), opts.narrow)}</label>
-          <label class="wide">排除词 <input id="sqExcl" value="${esc(opts.excl)}" placeholder="-trading -alibaba -marketplace"></label>
+          <label class="wide">排除词 <input id="sqExcl" value="${esc(opts.excl)}" placeholder="-alibaba -made-in-china -marketplace -dropship"></label>
         </div>
         <div class="row wrap-gap" style="margin-top:10px">
           <button class="btn primary sm" data-act="sqBuild">重新生成</button>
@@ -370,15 +388,15 @@
       <div class="card-h"><h3>③ 搜到的人，回填成线索</h3><span class="sub">带来源链接，后面好复核</span></div>
       <div class="card-b">
         <div class="sq-form">
-          <label>公司名 <input id="sqCo" placeholder="如 Frenos del Norte S.A."></label>
+          <label>公司名 <input id="sqCo" placeholder="如 Little Closet Trading LLC"></label>
           <label>国家 ${sel('sqCountry', MARKETS.map(x => ({ v: x.name, t: x.name })), m.name)}</label>
           <label>类型 ${sel('sqKind', Object.keys(TYPES).map(k => ({ v: TYPES[k].zh, t: TYPES[k].zh })), '经销商')}</label>
           <label class="wide">来源链接 <input id="sqUrl" placeholder="https://..."></label>
-          <label class="wide">备注 <input id="sqNote" placeholder="搜到什么：主营 BPW 挂车件 / 有 3 家门店"></label>
+          <label class="wide">备注 <input id="sqNote" placeholder="搜到什么：主营女童连衣裙 / 有 3 家门店"></label>
         </div>
         <div class="row wrap-gap" style="margin-top:10px">
           <button class="btn primary sm" data-act="sqSave">加入线索</button>
-          <span class="tiny muted">进「询盘线索」后可以继续打分、匹配型号</span>
+          <span class="tiny muted">进「询盘线索」后可以继续打分、匹配款号</span>
         </div>
       </div>
     </div>
@@ -391,7 +409,7 @@
         <div>① 只看近 12 个月，三年前的记录不算数</div>
         <div>② 一年 ≥4 票且间隔稳定 → 优先名单；一年一票多是调货贸易商 → 观察区</div>
         <div>③ 抓切换信号：从印度/越南转中国采购、新增 shipper、原供应商份额下滑</div>
-        <div>④ 别信 notify party（多为清关行/货代）；别只按 HS 编码拉（8708.30 太宽，摩擦材料可能落 6813.81）</div>
+        <div>④ 别信 notify party（多为清关行/货代）；别只按 HS 编码拉（6104.42 / 6110.20 太宽，婴儿连体衣可能落 6111.20）</div>
         <div class="muted">海关数据本身不含电话邮箱，平台上的联系方式是拼凑的，命中率有限，必须二次验证。</div>
       </div>
     </details>`;
@@ -449,7 +467,7 @@
     const stamp = date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0') +
       'T' + String(date.getHours()).padStart(2, '0') + ':' + String(date.getMinutes()).padStart(2, '0') + ':' + String(date.getSeconds()).padStart(2, '0');
     const out = [];
-    out.push('# 全球汽配可销售端检索式 · 生成于 ' + stamp);
+    out.push('# 全球童装采购端检索式 · 生成于 ' + stamp);
     out.push('# Google 版（可直接抄进浏览器；DDG 不完全支持 site:/filetype: 等语法）');
     out.push('');
     PRESET_REGIONS.forEach(r => r.rows.forEach(row => { out.push(row.google); out.push(row.g2); }));
@@ -458,7 +476,7 @@
     out.push('');
     PRESET_REGIONS.forEach(r => r.rows.forEach(row => out.push(row.ddg)));
     out.push('');
-    out.push('# 本地语种锚点（终端客户不用英文搜）');
+    out.push('# 本地语种锚点（终端门店不用英文搜）');
     out.push('');
     PRESET_REGIONS.forEach(r => out.push('[' + r.k + ' ' + r.label.split(' ')[0] + '] ' + r.langs + ' ｜ 主渠道 ' + r.chan + ' ｜ ' + r.note));
     copyText(out.join('\n'), () => toast('已复制 ' + flatPresets().length + ' 组预设（含注释）'));
@@ -499,7 +517,7 @@
     axles.slice(0, 3).forEach(a => {
       db.fitments.filter(f => f.aid === a.id).forEach(f => {
         const p = db.products.find(x => x.id === (f.pid || f.productId));
-        if (p) push(p, '车桥命中 ' + a.brand + ' ' + a.model, 72);
+        if (p) push(p, '尺码段命中 ' + a.brand + ' ' + a.model, 72);
       });
     });
 
@@ -507,7 +525,7 @@
     vehs.slice(0, 3).forEach(v => {
       db.fitments.filter(f => f.vid === v.id).forEach(f => {
         const p = db.products.find(x => x.id === (f.pid || f.productId));
-        if (p) push(p, '车型命中 ' + (v.brand ? v.brand + ' ' : '') + v.model, 66);
+        if (p) push(p, '款式系列命中 ' + (v.brand ? v.brand + ' ' : '') + v.model, 66);
       });
     });
 
@@ -523,9 +541,9 @@
   function gapOf(p, db) {
     const tests = (db.tests || []).filter(t => t.pid === p.id);
     const gaps = [];
-    if (!p.dim || p.dimStatus !== '完整') gaps.push('尺寸（长×高×厚）没齐');
-    if (!tests.length) gaps.push('没有对应试验报告');
-    if (!(p.apps || []).length) gaps.push('适配车型待核');
+    if (!p.dim || p.dimStatus !== '已核尺码表') gaps.push('尺码表（身高 / 胸围 / 衣长）没齐');
+    if (!tests.length) gaps.push('没有对应质检报告');
+    if (!(p.apps || []).length) gaps.push('适穿尺码段待核');
     return { tests: tests.length, gaps };
   }
 
@@ -538,24 +556,24 @@
     <div class="row wrap-gap" style="justify-content:space-between;margin-bottom:12px">
       <div>
         <h1 style="margin:0">编号对照</h1>
-        <div class="muted small">输入自家型号 / WVA / FMSI / OE 别名 / 车型 / 车桥，查它在这张表里能对上谁，还差什么。</div>
+        <div class="muted small">输入自家款号 / 条码 EAN / 客户款号 / 旧款号 / 款式系列 / 尺码段，查它在这张表里能对上谁，还差什么。</div>
       </div>
       <button class="btn" data-act="tab" data-id="products">产品库 →</button>
     </div>
 
     <div class="card"><div class="card-b">
       <div class="row wrap-gap">
-        <input id="xrefQ" value="${esc(Q.q)}" placeholder="如 29087 / 4709 / MB/60/1 / 豪沃A7 / BPW TS2" style="flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:13.5px">
+        <input id="xrefQ" value="${esc(Q.q)}" placeholder="如 SW2601047 / DR2601001 / 6972026112300 / 奶油卫衣 / 110" style="flex:1;min-width:220px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;font-size:13.5px">
         <button class="btn primary" data-act="xrefGo">查</button>
-        ${['29087', '4709', 'BPW', '豪沃A7'].map(x => `<button class="chip" data-act="xrefQuick" data-id="${x}">${x}</button>`).join('')}
+        ${['SW2601047', 'DR2601001', '110', '奶油卫衣'].map(x => `<button class="chip" data-act="xrefQuick" data-id="${x}">${x}</button>`).join('')}
       </div>
-      <div class="tiny muted" style="margin-top:8px">同一 WVA 号可能覆盖多个车桥与车型；这里给候选集，不给唯一答案——这是行业事实，不是能力不足。</div>
+      <div class="tiny muted" style="margin-top:8px">同一个版型会派生多个尺码段与花色，款号与条码不是一对一；这里给候选集，不给唯一答案——这是童装行业事实，不是能力不足。</div>
     </div></div>
 
     ${Q.q ? (res.length ? `<div class="xref-list">
       ${res.map(({ p, why, score }) => {
         const g = gapOf(p, db);
-        const ask = g.gaps.length ? (p.dim && p.dimStatus === '完整' ? '装哪个桥？BPW / 富华 / 约克？' : '这两片的长×高×厚各是多少？') : '已齐，可直接报价';
+        const ask = g.gaps.length ? (p.dim && p.dimStatus === '已核尺码表' ? '按哪个尺码段报？90–160 还是 2T–12Y？' : '这件平铺衣长 / 胸围 / 建议身高各是多少？') : '已齐，可直接报价';
         return `<div class="xref-item">
           <div class="xref-h">
             <b class="mono">${esc(p.code)}</b>
@@ -567,25 +585,25 @@
           </div>
           <div class="xref-meta small">
             <span>${esc(why)}</span>
-            <span class="mono">${esc(p.dim || '尺寸待补')}</span>
-            <span class="mono">${esc((p.altCodes || []).join(' / ') || '无 OE 别名')}</span>
-            <span>${g.tests} 份试验报告</span>
+            <span class="mono">${esc(p.dim || '尺码待补')}</span>
+            <span class="mono">${esc((p.altCodes || []).join(' / ') || '无客户款号 / 旧款号')}</span>
+            <span>${g.tests} 份质检报告</span>
           </div>
           <div class="xref-gap ${g.gaps.length ? '' : 'ok'}">
-            ${g.gaps.length ? '缺口：' + esc(g.gaps.join('、')) + ' → 只追问一句：<b>' + esc(ask) + '</b>' : '资料齐：尺寸 + 试验报告 + 适配都在，可作报价依据'}
+            ${g.gaps.length ? '缺口：' + esc(g.gaps.join('、')) + ' → 只追问一句：<b>' + esc(ask) + '</b>' : '资料齐：尺码 + 质检报告 + 适穿都在，可作报价依据'}
           </div>
         </div>`;
       }).join('')}
-    </div>` : `<div class="card"><div class="card-b muted small">没对上。换个号试试：目录里的 WVA 形如 <span class="mono">29087</span>，鼓式形状码形如 <span class="mono">4709</span>/<span class="mono">4515EA</span>，OE 别名形如 <span class="mono">MB/60/1</span>。</div></div>`) : ''}
+    </div>` : `<div class="card"><div class="card-b muted small">没对上。换个号试试：目录里的款号形如 <span class="mono">SW2601047</span>，条码形如 <span class="mono">6972026112300</span>，客户款号形如 <span class="mono">LC-2600B</span>。</div></div>`) : ''}
 
     <div class="card">
       <div class="card-h"><h3>这张表要建的四列</h3><span class="sub">建起来，三件事同时解决</span></div>
       <div class="card-b small" style="line-height:1.9">
-        <div><b>自家型号</b> ↔ <b>WVA / FMSI 形状码</b> ↔ <b>车桥与卡钳平台</b> ↔ <b>尺寸（长/高/厚/鼓径）</b></div>
-        <div>↔ 各主机厂 OE 别名 ↔ 材质与摩擦等级（FF/GG）↔ 对应测试报告编号 ↔ 照片</div>
-        <div class="muted" style="margin-top:8px">常见车桥：BPW · SAF-Holland · Meritor / ROR · Fuwa 富华 · Schmitz；常见卡钳：Knorr-Bremse · Bendix ADB22X · Meritor EX225</div>
-        <div class="muted">认证：ECE R90 · IATF 16949 · SAE J866（FF/GG）· SAE J2522 台架矩阵</div>
-        <div class="muted" style="margin-top:8px">现有车桥：${axles.map(a => esc(a.brand + ' ' + a.model)).join(' · ')}</div>
+        <div><b>自家款号</b> ↔ <b>平台款号 / 条码 EAN</b> ↔ <b>尺码段与适穿系列</b> ↔ <b>尺码（身高 / 胸围 / 衣长）</b></div>
+        <div>↔ 客户款号 / 旧款号 / 竞品款号 ↔ 面料与克重（180–300 g/m²）↔ 对应质检报告编号 ↔ 照片</div>
+        <div class="muted" style="margin-top:8px">常见尺码段：婴童 59–98 · 小童 90–120 · 中童 110–140 · 大童 130–160；常见版型：宽松 · 标准 · 修身</div>
+        <div class="muted">质检：GB 31701-2015（A/B/C 类）· GB 18401-2010 · OEKO-TEX Standard 100 · 起球 4 级 / 色牢度 4 级</div>
+        <div class="muted" style="margin-top:8px">现有尺码段：${axles.map(a => esc(a.brand + ' ' + a.model)).join(' · ')}</div>
       </div>
     </div>`;
   }

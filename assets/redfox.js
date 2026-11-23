@@ -539,9 +539,9 @@
     if (ST.noApi) {
       return `<div class="rf-err">${t2(
         '这个地址上没有查询接口：/api 返回的是网页，不是数据，所以查询用不了。放到服务器上时，nginx 要把 /api 转发给 server.js'
-          + '（配置见 tools/deploy/nginx-kooying.conf）；本地请用 http://127.0.0.1:8765/index.html 打开。当前地址：',
+          + '（配置见 tools/deploy/nginx-xiaoman.conf）；本地请用 http://127.0.0.1:8765/index.html 打开。当前地址：',
         'This address has no query API: /api returns a web page instead of data. On a server, nginx must forward /api to server.js'
-          + ' (see tools/deploy/nginx-kooying.conf); locally open http://127.0.0.1:8765/index.html. Current address: '
+          + ' (see tools/deploy/nginx-xiaoman.conf); locally open http://127.0.0.1:8765/index.html. Current address: '
       )}${location.origin} ${btn}</div>`;
     }
     return `<div class="rf-err">${t2(
@@ -701,7 +701,7 @@
 
   function buildPayload(kind) {
     const a = ST.args;
-    const p = { source: 'RedFox · 冠英选型中台' };
+    const p = { source: 'RedFox · 小满童装选款中台' };
     if (ST.plat === 'tiktok') {
       p.count = ST.count;
       if (kind.id === 'topic') {
@@ -735,7 +735,7 @@
         p.sort = a.sort || '综合';
         p.page = 1;
         p.size = ST.count;
-        p.source = 'RedFox · 冠英选型中台';
+        p.source = 'RedFox · 小满童装选款中台';
       }
     } else {
       p.keyword = a.keyword || '';
@@ -821,7 +821,7 @@
           if (/^\s*</.test(text)) {
             ST.err = '这个地址上没有查询接口：/api/redfox/rest 返回的是一整页 HTML，不是数据（HTTP ' + r.status + '）。'
               + '本页要用 http://127.0.0.1:8765/index.html 打开；放到服务器上的话，nginx 得把 /api 转发给 server.js'
-              + '（配置见 tools/deploy/nginx-kooying.conf）。当前地址：' + location.origin;
+              + '（配置见 tools/deploy/nginx-xiaoman.conf）。当前地址：' + location.origin;
             ST.serverOk = false; ST.statusAt = Date.now(); ST.noApi = true;
           } else {
             ST.err = '返回的不是 JSON（HTTP ' + r.status + '）：' + String(text).slice(0, 80);

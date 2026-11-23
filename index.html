@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>冠英 · 选型与报价中台</title>
-<meta name="description" content="车型 / 车桥 / 编码 → 刹车片型号 → 报价与客户资料包。冠英（KOOYING）选型数据库与报价中台。">
+<title>小满童装 · 选款与报价中台</title>
+<meta name="description" content="款式 / 尺码 / 款号 → 童装 SKU → 报价与客户资料包。小满童装（XIAOMAN KIDS）选款数据库与报价中台。">
 <link rel="stylesheet" href="assets/style.css">
 <link rel="stylesheet" href="assets/theme.css">
 </head>
@@ -15,16 +15,16 @@
   <div class="topbar-in">
     <div class="brand" id="brandHome" data-act="tab" data-id="home" role="button" tabindex="0"
          title="回到首页" aria-label="回到首页">
-      <img class="brand-logo" src="assets/img/logo.jpg" alt="KOOYING 冠英 AUTO PARTS">
+      <img class="brand-logo" src="assets/img/logo.jpg" alt="XIAOMAN KIDS 小满童装">
       <div class="brand-sep"></div>
       <div>
-        <div class="brand-t">选型与报价中台</div>
+        <div class="brand-t">选款与报价中台</div>
         <div class="brand-s">Selection &amp; Quotation Hub</div>
       </div>
     </div>
     <div class="gsearch">
       <span class="ico">⌕</span>
-      <input id="gsearch" type="text" placeholder="输入车型 / 车桥 / 旧件编码 / 客户原话，回车开始匹配（如 豪沃A7、457桥、29087）">
+      <input id="gsearch" type="text" placeholder="输入款式 / 尺码 / 水洗标款号 / 客户原话，回车开始选款（如 奶油卫衣、110 码、XM-SW-2601）">
     </div>
     <div class="top-actions">
       <span class="tz-badge" id="tzNow">本地 --:--</span>
@@ -76,7 +76,7 @@
 <div class="gate-mask" id="gateMask">
   <div class="gate-card" role="dialog" aria-modal="true">
     <div class="gate-head" id="gateHead" style="cursor:default;user-select:none;-webkit-user-select:none">
-      <img class="gate-logo" src="assets/img/logo.jpg" alt="KOOYING 冠英">
+      <img class="gate-logo" src="assets/img/logo.jpg" alt="XIAOMAN KIDS 小满童装">
       <div>
         <h2 id="gateTitle">选择入口</h2>
         <p id="gateSub">客户用手机号 / 邮箱 / WhatsApp 登录；员工用访问码进入管理端。</p>
@@ -90,10 +90,10 @@
 <div class="lang-mask" id="langMask">
   <div class="lang-card" role="dialog" aria-modal="true" aria-labelledby="langTitle">
     <div class="lang-head">
-      <img class="gate-logo" src="assets/img/logo.jpg" alt="KOOYING 冠英">
+      <img class="gate-logo" src="assets/img/logo.jpg" alt="XIAOMAN KIDS 小满童装">
       <div>
         <h2 id="langTitle">选择界面语言</h2>
-        <p id="langSub">面向国际市场的版本：界面文案跟随语言切换，产品型号与编码保持原样。</p>
+        <p id="langSub">面向国际市场的版本：界面文案跟随语言切换，款号与尺码保持原样。</p>
       </div>
     </div>
     <div class="lang-grid" id="langGrid"></div>
@@ -118,14 +118,14 @@
     </div>
     <div class="perm-body" id="permBody"></div>
     <div class="perm-foot">
-      <span class="tiny muted">演示版：客户用任意手机号 / 邮箱 / WhatsApp 登录；员工访问码 GY2024</span>
+      <span class="tiny muted">演示版：客户用任意手机号 / 邮箱 / WhatsApp 登录；员工访问码 XM2026</span>
       <span class="flex1"></span>
       <button class="btn sm" data-act="closePerm">知道了</button>
     </div>
   </div>
 </div>
 
-<!-- 客服解答：浮窗监听 + 车型提醒 -->
+<!-- 客服解答：浮窗监听 + 款式/尺码提醒 -->
 <div id="chatAlert" class="chat-alert"></div>
 <button id="chatFab" class="chat-fab" data-act="chatToggle">
   <span class="fab-av"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 13v-1a7.5 7.5 0 0 1 15 0v1"/><rect x="2.6" y="12.6" width="4" height="6.2" rx="1.7"/><rect x="17.4" y="12.6" width="4" height="6.2" rx="1.7"/><path d="M12 19.3h2.2a2.8 2.8 0 0 0 2.8-2.8"/></svg></span>
@@ -152,7 +152,7 @@
   </div>
   <div class="chat-body" id="chatBody"></div>
   <div class="cs-compose" id="csCompose" hidden>
-    <input id="csInput" type="text" placeholder="输入车型 / 数量 / 问题，回车发送…" autocomplete="off">
+    <input id="csInput" type="text" placeholder="输入款式 / 尺码 / 数量，回车发送…" autocomplete="off">
     <button class="btn primary sm" data-act="csSend">发送</button>
   </div>
   <div class="chat-f" id="chatFoot">

@@ -1,5 +1,5 @@
 ﻿$ErrorActionPreference = 'Stop'
-$src   = 'E:\湖北\冠英数据中台'
+$src   = 'E:\湖北\tongzhuang'
 $out   = 'E:\湖北'
 $stamp = Get-Date -Format 'yyyyMMdd'
 $tmp   = Join-Path $env:TEMP ('gypack_' + $stamp)
@@ -17,7 +17,7 @@ Copy-Item (Join-Path $src 'docs\使用说明.md') (Join-Path $full '使用说明
 robocopy $full $lite /E /NFL /NDL /NJH /NJS /XD (Join-Path $full 'assets\video') | Out-Null
 
 $lines = @(
-  '冠英 · 选型与报价中台',
+  '小满童装 · 选款与报价中台',
   ('打包日期：' + (Get-Date -Format 'yyyy-MM-dd HH:mm')),
   '',
   '【怎么用】',
@@ -28,7 +28,7 @@ $lines = @(
   '【四个入口】',
   '· 客户：任意联系方式登录（WhatsApp / 手机 / 邮箱 / 微信）',
   '· 体验版·客户 / 体验版·员工 / 体验版·老板：点闪电按钮，什么都不用填（员工与老板为只读）',
-  '· 员工访问码：GY2024    老板访问码：GYBOSS',
+  '· 员工访问码：XM2026    老板访问码：XMBOSS',
   '  要改的话，编辑 assets\auth.js 顶部的 STAFF_CODE / BOSS_CODE',
   '',
   '【内容清单】',
@@ -49,8 +49,8 @@ $enc = New-Object System.Text.UTF8Encoding($false)
 [System.IO.File]::WriteAllText((Join-Path $full '快速开始.txt'), $readme, $enc)
 [System.IO.File]::WriteAllText((Join-Path $lite '快速开始.txt'), $readme, $enc)
 
-$zipFull = Join-Path $out ('冠英数据中台_{0}_完整版.zip' -f $stamp)
-$zipLite = Join-Path $out ('冠英数据中台_{0}_轻量版.zip' -f $stamp)
+$zipFull = Join-Path $out ('小满童装中台_{0}_完整版.zip' -f $stamp)
+$zipLite = Join-Path $out ('小满童装中台_{0}_轻量版.zip' -f $stamp)
 Remove-Item $zipFull, $zipLite -Force -ErrorAction SilentlyContinue
 
 Compress-Archive -Path (Join-Path $full '*') -DestinationPath $zipFull -CompressionLevel Optimal

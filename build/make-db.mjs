@@ -1,97 +1,140 @@
-// 生成 SQLite 数据库：data/guanying.db（可直接给 IT / BI / CRM 集成）
-import { DatabaseSync } from 'node:sqlite';
+/* 由 data/db.json 生成 SQLite：data/xiaoman.db（可直接给 IT / BI / CRM / ERP 集成）
+ * 运行：node build\make-db.mjs
+ */
 import fs from 'node:fs';
 import path from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
-const DBJ = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'db.json'), 'utf8'));
-const OUT = path.join(ROOT, 'data', 'guanying.db');
+const DB = JSON.parse(fs.readFileSync(path.join(ROOT, 'data', 'db.json'), 'utf8'));
+const OUT = path.join(ROOT, 'data', 'xiaoman.db');
 if (fs.existsSync(OUT)) fs.rmSync(OUT);
 
 const db = new DatabaseSync(OUT);
 db.exec(`
 PRAGMA journal_mode = WAL;
-CREATE TABLE meta        (key TEXT PRIMARY KEY, value TEXT);
-CREATE TABLE materials   (id TEXT PRIMARY KEY, name TEXT, name_en TEXT, mu TEXT, temp TEXT, factor REAL, traits TEXT, fit TEXT, note TEXT);
-CREATE TABLE brands      (id TEXT PRIMARY KEY, name TEXT, desc TEXT);
-CREATE TABLE products    (id TEXT PRIMARY KEY, sku TEXT UNIQUE, code TEXT, name_zh TEXT, name_en TEXT, cat TEXT, cat_en TEXT,
-                          brand TEXT, material TEXT, pos TEXT, dim TEXT, holes INTEGER, dim_status TEXT,
-                          price_usd REAL, moq INTEGER, pack_per TEXT, pack_gw REAL, pack_cbm REAL, hs TEXT,
-                          apps TEXT, common_vehicles TEXT, img TEXT, url TEXT, desc TEXT, spec_status TEXT);
-CREATE TABLE codes       (id TEXT PRIMARY KEY, code TEXT, norm TEXT, pid TEXT, type TEXT, source TEXT, conf TEXT, note TEXT,
-                          FOREIGN KEY(pid) REFERENCES products(id));
-CREATE TABLE vehicles    (id TEXT PRIMARY KEY, brand TEXT, series TEXT, model TEXT, years TEXT, cls TEXT, alias TEXT, axles TEXT, note TEXT);
-CREATE TABLE axles       (id TEXT PRIMARY KEY, brand TEXT, model TEXT, type TEXT, cap TEXT, spec TEXT, alias TEXT);
-CREATE TABLE fitments    (id TEXT PRIMARY KEY, vid TEXT, aid TEXT, pid TEXT, code TEXT, pos TEXT, fit TEXT, conf TEXT, src TEXT, questions TEXT,
-                          FOREIGN KEY(vid) REFERENCES vehicles(id), FOREIGN KEY(pid) REFERENCES products(id));
-CREATE TABLE tests       (id TEXT PRIMARY KEY, pid TEXT, code TEXT, pname TEXT, std TEXT, item TEXT, result TEXT, verdict TEXT, lab TEXT, no TEXT, date TEXT);
-CREATE TABLE customers   (id TEXT PRIMARY KEY, name TEXT, country TEXT, region TEXT, type TEXT, tz TEXT, grade TEXT, brand TEXT,
-                          price_level TEXT, incoterm TEXT, pay TEXT, last_order TEXT, note TEXT);
-CREATE TABLE leads       (id TEXT PRIMARY KEY, created TEXT, src TEXT, company TEXT, contact TEXT, country TEXT, tz TEXT,
-                          need TEXT, need_zh TEXT, status TEXT, score INTEGER, owner TEXT, next_action TEXT, next_date TEXT, products TEXT, note TEXT);
 
+CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT);
+CREATE TABLE company (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  name TEXT, name_en TEXT, brand TEXT, founded INTEGER,
+  site TEXT, capacity TEXT, staff TEXT, markets TEXT, certs TEXT, web TEXT
+);
+CREATE TABLE materials (
+  id TEXT PRIMARY KEY, name TEXT, name_en TEXT, weight TEXT, wash TEXT,
+  factor REAL, traits TEXT, fit TEXT, note TEXT
+);
+CREATE TABLE brands (id TEXT PRIMARY KEY, name TEXT, desc TEXT);
+CREATE TABLE series (
+  id TEXT PRIMARY KEY, line TEXT, name TEXT, model TEXT, season TEXT, cls TEXT, note TEXT,
+  alias TEXT, fit_count INTEGER
+);
+CREATE TABLE size_bands (
+  id TEXT PRIMARY KEY, group_name TEXT, model TEXT, type TEXT, age TEXT, spec TEXT, alias TEXT
+);
+CREATE TABLE products (
+  id TEXT PRIMARY KEY, sku TEXT UNIQUE, code TEXT UNIQUE,
+  name_zh TEXT, name_en TEXT, cat TEXT, cat_en TEXT, brand_line TEXT, material TEXT,
+  fit TEXT, size_range TEXT, gsm INTEGER, price_usd REAL, moq INTEGER,
+  pack_per TEXT, pack_gw REAL, pack_cbm REAL, hs TEXT, status TEXT,
+  img TEXT, desc_en TEXT, desc_zh TEXT
+);
+CREATE TABLE codes (
+  id TEXT PRIMARY KEY, code TEXT, norm TEXT, pid TEXT, type TEXT, source TEXT, conf TEXT, note TEXT,
+  FOREIGN KEY (pid) REFERENCES products(id)
+);
+CREATE TABLE fitments (
+  id TEXT PRIMARY KEY, series_id TEXT, band_id TEXT, pid TEXT, code TEXT,
+  fit_style TEXT, fit_type TEXT, conf TEXT, src TEXT, series_name TEXT, band_name TEXT,
+  FOREIGN KEY (series_id) REFERENCES series(id),
+  FOREIGN KEY (band_id) REFERENCES size_bands(id),
+  FOREIGN KEY (pid) REFERENCES products(id)
+);
+CREATE TABLE tests (
+  id TEXT PRIMARY KEY, pid TEXT, code TEXT, pname TEXT, std TEXT, item TEXT,
+  result TEXT, verdict TEXT, lab TEXT, no TEXT, date TEXT
+);
+CREATE TABLE customers (
+  id TEXT PRIMARY KEY, name TEXT, country TEXT, region TEXT, type TEXT, tz TEXT,
+  grade TEXT, brand_line TEXT, price_level TEXT, incoterm TEXT, pay TEXT, last_order TEXT, note TEXT
+);
+CREATE TABLE leads (
+  id TEXT PRIMARY KEY, created TEXT, src TEXT, company TEXT, contact TEXT, country TEXT, tz TEXT,
+  need TEXT, need_zh TEXT, status TEXT, score INTEGER, owner TEXT,
+  next_action TEXT, next_date TEXT, note TEXT
+);
+CREATE TABLE score_rules (k TEXT PRIMARY KEY, w INTEGER, label TEXT, desc TEXT);
+CREATE TABLE templates (id TEXT PRIMARY KEY, name TEXT, lang TEXT, body TEXT);
+
+CREATE INDEX idx_products_cat ON products(cat);
+CREATE INDEX idx_products_price ON products(price_usd);
 CREATE INDEX idx_codes_norm ON codes(norm);
-CREATE INDEX idx_codes_pid  ON codes(pid);
-CREATE INDEX idx_fit_vid    ON fitments(vid);
-CREATE INDEX idx_fit_pid    ON fitments(pid);
-CREATE INDEX idx_fit_aid    ON fitments(aid);
-CREATE INDEX idx_prod_cat   ON products(cat);
+CREATE INDEX idx_codes_pid ON codes(pid);
+CREATE INDEX idx_fit_series ON fitments(series_id);
+CREATE INDEX idx_fit_band ON fitments(band_id);
+CREATE INDEX idx_fit_pid ON fitments(pid);
+CREATE INDEX idx_tests_pid ON tests(pid);
 
-CREATE VIEW v_code_lookup AS
-  SELECT c.code AS matched_code, c.type AS code_type, c.conf AS code_conf, c.source AS code_source,
-         p.code AS model, p.name_zh, p.cat, p.dim, p.material, p.price_usd
-  FROM codes c JOIN products p ON p.id = c.pid;
+CREATE VIEW v_style_profile AS
+SELECT p.id, p.sku, p.code, p.cat, p.name_zh, p.size_range, p.gsm,
+       m.name AS fabric, p.price_usd, p.moq,
+       (SELECT COUNT(*) FROM codes c WHERE c.pid = p.id) AS code_count,
+       (SELECT COUNT(*) FROM fitments f WHERE f.pid = p.id) AS fit_count
+FROM products p LEFT JOIN materials m ON m.id = p.material;
 
-CREATE VIEW v_product_fitment AS
-  SELECT p.code AS model, p.cat, p.dim, v.brand || ' ' || v.series || ' ' || v.model AS vehicle,
-         a.brand || ' ' || a.model AS axle, f.pos, f.fit, f.conf, f.src
-  FROM fitments f
-  JOIN products p ON p.id = f.pid
-  LEFT JOIN vehicles v ON v.id = f.vid
-  LEFT JOIN axles a ON a.id = f.aid;
+CREATE VIEW v_size_band_fit AS
+SELECT f.id, s.name AS series, s.model AS series_model, b.model AS size_band,
+       b.type AS band_type, b.age, f.pid, f.code, f.fit_style, f.fit_type, f.conf, f.src
+FROM fitments f
+JOIN series s ON s.id = f.series_id
+LEFT JOIN size_bands b ON b.id = f.band_id;
 `);
 
-const ins = t => db.prepare(`INSERT INTO ${t} VALUES (${Array.from({ length: cols[t] }, () => '?').join(',')})`);
-const cols = {
-  meta: 2, materials: 9, brands: 3, products: 25, codes: 8, vehicles: 9, axles: 7, fitments: 10,
-  tests: 11, customers: 13, leads: 16
+const ins = (sql, rows) => {
+  const st = db.prepare(sql);
+  for (const r of rows) st.run(...r);
 };
+const j = v => Array.isArray(v) ? JSON.stringify(v) : (v == null ? '' : String(v));
+const c = DB.meta.company;
 
-db.exec('BEGIN');
-Object.entries(DBJ.meta).forEach(([k, v]) => ins('meta').run(k, typeof v === 'object' ? JSON.stringify(v) : String(v)));
-DBJ.materials.forEach(m => ins('materials').run(m.id, m.name, m.nameEn, m.mu, m.temp, m.factor, JSON.stringify(m.traits), m.fit, m.note));
-DBJ.brands.forEach(b => ins('brands').run(b.id, b.name, b.desc));
-DBJ.products.forEach(p => ins('products').run(
-  p.id, p.sku, p.code, p.nameZh, p.nameEn, p.cat, p.catEn, p.brand, p.material, p.pos || '', p.dim || '',
-  p.holes ?? null, p.dimStatus, p.price, p.moq, p.pack.per, p.pack.gw, p.pack.cbm, p.hs,
-  JSON.stringify(p.appsAll || []), JSON.stringify(p.commonVehicles || []), p.img, p.url, p.desc, p.specStatus
-));
-DBJ.codes.forEach(c => ins('codes').run(c.id, c.code, c.norm, c.pid, c.type, c.source, c.conf, c.note || ''));
-DBJ.vehicles.forEach(v => ins('vehicles').run(v.id, v.brand, v.series, v.model, v.years, v.cls, JSON.stringify(v.alias), JSON.stringify(v.axles || []), v.note || ''));
-DBJ.axles.forEach(a => ins('axles').run(a.id, a.brand, a.model, a.type, a.cap, a.spec, JSON.stringify(a.alias)));
-DBJ.fitments.forEach(f => ins('fitments').run(f.id, f.vid, f.aid, f.pid, f.code, f.pos, f.fit, f.conf, f.src, JSON.stringify(f.q || [])));
-DBJ.tests.forEach(t => ins('tests').run(t.id, t.pid, t.code, t.pname, t.std, t.item, t.result, t.verdict, t.lab, t.no, t.date));
-DBJ.customers.forEach(c => ins('customers').run(c.id, c.name, c.country, c.region, c.type, c.tz, c.grade, c.brand, c.priceLevel, c.incoterm, c.pay, c.last, c.note));
-DBJ.leads.forEach(l => ins('leads').run(l.id, l.created, l.src, l.company, l.contact, l.country, l.tz, l.need, l.needZh || '', l.status, null, l.owner, l.next || '', l.nextDate || '', JSON.stringify(l.product || []), l.note || ''));
-db.exec('COMMIT');
+ins('INSERT INTO meta(key,value) VALUES(?,?)', [
+  ['version', DB.meta.version], ['name', DB.meta.name], ['subtitle', DB.meta.subtitle],
+  ['built', DB.meta.built], ['products', String(DB.stats.products)], ['codes', String(DB.stats.codes)],
+  ['series', String(DB.stats.vehicles)], ['size_bands', String(DB.stats.axles)],
+  ['fitments', String(DB.stats.fitments)], ['tests', String(DB.stats.tests)],
+  ['notices', j(DB.meta.notices)]
+]);
+ins('INSERT INTO company(id,name,name_en,brand,founded,site,capacity,staff,markets,certs,web) VALUES(1,?,?,?,?,?,?,?,?,?,?)',
+  [[c.name, c.nameEn, c.brand, c.founded, c.site, c.capacity, c.staff, c.markets, j(c.certs), c.web]]);
+ins('INSERT INTO materials(id,name,name_en,weight,wash,factor,traits,fit,note) VALUES(?,?,?,?,?,?,?,?,?)',
+  DB.materials.map(m => [m.id, m.name, m.nameEn, m.mu, m.temp, m.factor, j(m.traits), m.fit, m.note]));
+ins('INSERT INTO brands(id,name,desc) VALUES(?,?,?)', DB.brands.map(b => [b.id, b.name, b.desc]));
+ins('INSERT INTO series(id,line,name,model,season,cls,note,alias,fit_count) VALUES(?,?,?,?,?,?,?,?,?)',
+  DB.vehicles.map(v => [v.id, v.brand, v.series, v.model, v.years, v.cls, v.note, j(v.alias), v.fitCount]));
+ins('INSERT INTO size_bands(id,group_name,model,type,age,spec,alias) VALUES(?,?,?,?,?,?,?)',
+  DB.axles.map(a => [a.id, a.brand, a.model, a.type, a.cap, a.spec, j(a.alias)]));
+ins(`INSERT INTO products(id,sku,code,name_zh,name_en,cat,cat_en,brand_line,material,fit,size_range,gsm,price_usd,moq,pack_per,pack_gw,pack_cbm,hs,status,img,desc_en,desc_zh)
+     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+  DB.products.map(p => [p.id, p.sku, p.code, p.nameZh, p.nameEn, p.cat, p.catEn, p.brand, p.material,
+    p.pos, p.dim, p.holes, p.price, p.moq, p.pack.per, p.pack.gw, p.pack.cbm, p.hs, p.status, p.img, p.desc, p.descZh || '']));
+ins('INSERT INTO codes(id,code,norm,pid,type,source,conf,note) VALUES(?,?,?,?,?,?,?,?)',
+  DB.codes.map(x => [x.id, x.code, x.norm, x.pid, x.type, x.source, x.conf, x.note || '']));
+ins(`INSERT INTO fitments(id,series_id,band_id,pid,code,fit_style,fit_type,conf,src,series_name,band_name)
+     VALUES(?,?,?,?,?,?,?,?,?,?,?)`,
+  DB.fitments.map(f => [f.id, f.vid, f.aid, f.pid, f.code, f.pos, f.fit, f.conf, f.src, f.vName, f.aName]));
+ins('INSERT INTO tests(id,pid,code,pname,std,item,result,verdict,lab,no,date) VALUES(?,?,?,?,?,?,?,?,?,?,?)',
+  DB.tests.map(t => [t.id, t.pid, t.code, t.pname, t.std, t.item, t.result, t.verdict, t.lab, t.no, t.date]));
+ins(`INSERT INTO customers(id,name,country,region,type,tz,grade,brand_line,price_level,incoterm,pay,last_order,note)
+     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+  DB.customers.map(x => [x.id, x.name, x.country, x.region, x.type, x.tz, x.grade, x.brand, x.priceLevel, x.incoterm, x.pay, x.last, x.note]));
+ins(`INSERT INTO leads(id,created,src,company,contact,country,tz,need,need_zh,status,score,owner,next_action,next_date,note)
+     VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+  DB.leads.map(l => [l.id, l.created, l.src, l.company, l.contact, l.country, l.tz, l.need, l.needZh, l.status, l.score, l.owner, l.next, l.nextDate, l.note]));
+ins('INSERT INTO score_rules(k,w,label,desc) VALUES(?,?,?,?)', DB.scoreRules.map(r => [r.k, r.w, r.label, r.desc]));
+ins('INSERT INTO templates(id,name,lang,body) VALUES(?,?,?,?)', DB.templates.map(t => [t.id, t.name, t.lang, t.body]));
 
-// 线索评分写入（与前端规则一致）
-const leads = db.prepare('SELECT * FROM leads').all();
-const upd = db.prepare('UPDATE leads SET score = ? WHERE id = ?');
-for (const l of leads) {
-  const name = (l.company || '').toLowerCase();
-  const trading = /trading|import|export|fze|贸易|进出口/.test(name);
-  const terminal = /fleet|transport|taller|repair|center|车队|修理|物流|运输/.test(name) || /车队|修理厂/.test(l.note || '');
-  const spec = JSON.parse(l.products || '[]').length ? 14 : (/howo|j6|bpw|actros|j6p|豪沃|解放|德龙|天龙|fvr|npr|hino/i.test(l.need || '') ? 10 : 0);
-  const vol = /(\d{2,5})\s*(sets?|套|pcs|片|unidades|台)/i.test(l.need || '') ? 12 : 0;
-  const reach = l.contact && l.contact !== '—' ? 10 : 0;
-  let s = 30 + (terminal ? 18 : 0) - (trading ? 14 : 0) + spec + vol + reach + (l.tz ? 4 : 0);
-  upd.run(Math.max(5, Math.min(99, Math.round(s))), l.id);
-}
-
-const count = t => db.prepare(`SELECT COUNT(*) c FROM ${t}`).get().c;
-const summary = ['products', 'codes', 'vehicles', 'axles', 'fitments', 'tests', 'customers', 'leads'].map(t => `${t}=${count(t)}`).join(' ');
+const count = t => db.prepare(`SELECT COUNT(*) AS n FROM ${t}`).get().n;
+console.log('data/xiaoman.db 已生成');
+for (const t of ['products', 'codes', 'series', 'size_bands', 'fitments', 'tests', 'materials', 'customers', 'leads'])
+  console.log(`  ${t}: ${count(t)}`);
 db.close();
-console.log('SQLite 写入完成:', OUT);
-console.log(summary);
-console.log('size', (fs.statSync(OUT).size / 1024 / 1024).toFixed(2), 'MB');

@@ -18,10 +18,18 @@ node_modules/
 
 # RedFox Key 只放服务端，绝不进仓库
 tools/redfox-key.txt
-data/
-kooying.tar.gz
+# data/ 不作整体忽略：db.json / xiaoman.db / 导入模板.xlsx 是交付物；只忽略本地运行存储
+data/store.json
+data/store.json.tmp
+*.db-wal
+*.db-shm
+xiaoman.tar.gz
 
 # 软件著作权登记材料：仅本地保存，不进仓库
 docs/软著/
 # 软著材料生成脚本（内含说明书全文，同样不进仓库）
 tools/gen-ruanzhu*.py
+
+# 本地验收工具产生的临时目录（Edge 配置 / 截图）
+_edge/
+_shots/

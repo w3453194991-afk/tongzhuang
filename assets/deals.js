@@ -48,14 +48,14 @@
     if (f.inq) return LZ ? '提交了 ' + f.inq + ' 张询价单' : f.inq + ' RFQ(s)';
     if (f.ask) return LZ ? '在客服里问了 ' + f.ask + ' 次价' : 'asked price ' + f.ask + 'x';
     if (f.quotes) return LZ ? '打开过报价单' : 'opened quote';
-    if (f.carts) return LZ ? '把型号加入了报价' : 'added parts to quote';
-    return LZ ? '浏览了 ' + f.views + ' 个型号' : 'viewed ' + f.views + ' parts';
+    if (f.carts) return LZ ? '把款号加入了报价' : 'added styles to quote';
+    return LZ ? '浏览了 ' + f.views + ' 个款号' : 'viewed ' + f.views + ' styles';
   }
 
   /**
    * 待跟进客户 = 有咨询/问价行为、但还没成交的客户。
    * 数据全部来自「客户浏览」里记录的客户事件（AUTH 的 users[].events）：
-   *   inquiry 前台提交询价 / quote 打开报价单 / addCart 加入报价 / search 搜索 / view 看型号
+   *   inquiry 前台提交询价 / quote 打开报价单 / addCart 加入报价 / search 搜索 / view 看款号
    * 再加上客服窗口里的「问价」发言（custMsgs，由 app 传进来）。
    * 已成交的客户自动落到 won，不再催；手动忽略的进 mute。
    */
@@ -130,7 +130,7 @@
       } else if (quotes.length || carts.length || score >= 60) kind = 'hot';
       else kind = 'warm';
 
-      /* 要什么：从询价单和浏览记录里抽型号 */
+      /* 要什么：从询价单和浏览记录里抽款号 */
       const codes = [];
       inqs.forEach(e => (e.d && e.d.items || []).forEach(it => it && it.code && codes.push(it.code)));
       ev.forEach(e => { if (e.d && e.d.code) codes.push(e.d.code); });
@@ -147,7 +147,7 @@
         : (LZ ? LZ('回他问的价', 'Answer the price question') : 'Answer the price question');
       else if (kind === 'hot') next = (LZ ? LZ('追一次：报过价但没下单', 'Follow up: quoted, not ordered') : 'Follow up on the quote');
       else if (kind === 'won') next = (LZ ? LZ('维护：已成交，可推新品/复购', 'Maintain: repeat order or new items') : 'Maintain the account');
-      else next = (LZ ? LZ('试探：只在浏览，发个主推型号', 'Nudge: browsing only, send a pick') : 'Nudge with a pick');
+      else next = (LZ ? LZ('试探：只在浏览，发个主推款号', 'Nudge: browsing only, send a style') : 'Nudge with a style');
 
       out.push({
         uid: u.id, name: u.name, company: u.company || '', country: u.country || '',
@@ -477,7 +477,7 @@
     if (bestRate) parts.push('转化率最高的是 ' + bestRate.staff + '（' + bestRate.rate + '%）。');
     if (m.pipeline) parts.push('在谈金额 $' + fmt(m.pipeline) + '，是下个月的粮。');
     if (prods[0]) parts.push('卖得最好的是 ' + prods[0].code + '（$' + fmt(prods[0].amount) + '，' + prods[0].won + ' 单成交）。');
-    if (m.lost) parts.push('丢单 ' + m.lost + ' 笔，建议逐条记原因（价格 / 交期 / 认证）。');
+    if (m.lost) parts.push('丢单 ' + m.lost + ' 笔，建议逐条记原因（价格 / 交期 / 起订量）。');
     return parts.join(nl);
   }
 
@@ -523,19 +523,19 @@
       '<div class="card"><div class="card-h"><h3>登记一笔</h3><span class="sub">金额自动按「数量 × 单价」，可改</span></div>',
       '<div class="card-b"><div class="sq-form">',
       '<label>客户 <select id="dCust">' + custs.map(c => '<option value="' + esc(c.name) + '|' + esc(c.country || '') + '">' + esc(c.company || c.name) + ' · ' + esc(c.country || '') + '</option>').join('') + '</select></label>',
-      '<label>型号 <input id="dCode" list="dCodeList" placeholder="HOWO1 / 29087"><datalist id="dCodeList">' + (ctx.codes || []).slice(0, 120).map(c => '<option value="' + esc(c) + '">').join('') + '</datalist></label>',
+      '<label>款号 <input id="dCode" list="dCodeList" placeholder="SW2601047 / DR2601001"><datalist id="dCodeList">' + (ctx.codes || []).slice(0, 120).map(c => '<option value="' + esc(c) + '">').join('') + '</datalist></label>',
       '<label>数量 <input id="dQty" type="number" min="1" step="50" value="500"></label>',
       '<label>单价 USD <input id="dPrice" type="number" min="0" step="0.1" placeholder="自动带出"></label>',
       '<label>金额 USD <input id="dAmount" type="number" min="0" step="1" placeholder="自动算"></label>',
       '<label>状态 <select id="dStatus">' + statusOpts('已成交') + '</select></label>',
       '<label>日期 <input id="dDate" type="date" value="' + today() + '"></label>',
-      '<label class="wide">备注 <input id="dNote" placeholder="如：BPW TS2 挂车，含资料包"></label>',
+      '<label class="wide">备注 <input id="dNote" placeholder="如：奶油小方圆领卫衣，含尺码表与质检报告"></label>',
       '</div>',
       '<div class="row wrap-gap" style="margin-top:10px"><button class="btn primary sm" data-act="dealAdd">登记</button>',
       '<span class="tiny muted">登记人：' + esc(me.name || '') + '</span></div></div></div>',
 
       '<div class="card"><div class="card-h"><h3>' + (isBoss ? '全部记录' : '我的记录') + '</h3><span class="sub">' + rows.length + ' 条</span></div>',
-      '<div class="tbl-wrap"><table><thead><tr><th>日期</th><th>客户</th><th>型号</th><th class="right">数量</th><th class="right">金额</th><th>状态</th>' + (isBoss ? '<th>员工</th>' : '') + '<th>备注</th><th></th></tr></thead><tbody>',
+      '<div class="tbl-wrap"><table><thead><tr><th>日期</th><th>客户</th><th>款号</th><th class="right">数量</th><th class="right">金额</th><th>状态</th>' + (isBoss ? '<th>员工</th>' : '') + '<th>备注</th><th></th></tr></thead><tbody>',
       rows.map(d => [
         '<tr class="deal-row" data-act="dealOpen" data-id="' + esc(d.id) + '" title="点开看这一单的完整信息">',
         '<td class="mono small">' + esc(d.date) + '</td>',
@@ -566,7 +566,7 @@
 
     return [
       '<div class="row wrap-gap" style="justify-content:space-between;margin-bottom:12px">',
-      '<div><h1 style="margin:0">业绩总览</h1><div class="muted small">只有老板能看：员工成交、转化、在谈与产品结构。数据来自员工登记，示例数据可随时清空。</div></div>',
+      '<div><h1 style="margin:0">业绩总览</h1><div class="muted small">只有老板能看：员工成交、转化、在谈与款号结构。数据来自员工登记，示例数据可随时清空。</div></div>',
       '<div class="row wrap-gap"><button class="btn" data-act="tab" data-id="deals">成交台账 →</button>',
       '<button class="btn" data-act="tab" data-id="visits">客户浏览 →</button></div></div>',
 
@@ -599,8 +599,8 @@
       '<div class="card"><div class="card-h"><h3>一句话总结</h3><span class="sub">自动生成，可照抄到周报</span></div>',
       '<div class="card-b"><div class="boss-sum">' + esc(summary(m, rows, prods)).split('\n').map(x => '<div>' + esc(x) + '</div>').join('') + '</div></div></div>',
 
-      '<div class="card"><div class="card-h"><h3>产品成交状态</h3><span class="sub">哪些型号真的在走量</span></div>',
-      '<div class="tbl-wrap"><table><thead><tr><th>型号</th><th class="right">记录</th><th class="right">成交量</th><th class="right">成交额</th><th class="right">成交</th><th class="right">丢单</th><th>最近</th><th>判断</th></tr></thead><tbody>',
+      '<div class="card"><div class="card-h"><h3>款式成交状态</h3><span class="sub">哪些款号真的在走量</span></div>',
+      '<div class="tbl-wrap"><table><thead><tr><th>款号</th><th class="right">记录</th><th class="right">成交量</th><th class="right">成交额</th><th class="right">成交</th><th class="right">丢单</th><th>最近</th><th>判断</th></tr></thead><tbody>',
       prods.slice(0, 10).map(p => {
         const verdict = p.won >= 2 ? '<span class="tag g">主力</span>' : p.won === 1 ? '<span class="tag b">起量</span>' : p.lost ? '<span class="tag n">只丢单</span>' : '<span class="tag y">在谈</span>';
         return '<tr><td class="mono b">' + esc(p.code) + '</td>' +
@@ -666,8 +666,8 @@
         '</div>',
 
         '<div class="dd-grid">',
-        '<div><span class="k">' + (LZ ? LZ('型号', 'Part no.') : 'Part no.') + '</span><b class="mono">' + esc(d.code || '—') + '</b></div>',
-        '<div><span class="k">' + (LZ ? LZ('产品名', 'Product') : 'Product') + '</span><b>' + esc(d.pname || '—') + '</b></div>',
+        '<div><span class="k">' + (LZ ? LZ('款号', 'Style no.') : 'Style no.') + '</span><b class="mono">' + esc(d.code || '—') + '</b></div>',
+        '<div><span class="k">' + (LZ ? LZ('款式名称', 'Style name') : 'Style name') + '</span><b>' + esc(d.pname || '—') + '</b></div>',
         '<div><span class="k">' + (LZ ? LZ('日期', 'Date') : 'Date') + '</span><b class="mono">' + esc(d.date) + '</b></div>',
         '<div><span class="k">' + (LZ ? LZ('状态', 'Status') : 'Status') + '</span><b>' + esc(stName(d.status)) + '</b></div>',
         '<div><span class="k">' + (LZ ? LZ('国家 / 市场', 'Country') : 'Country') + '</span><b>' + esc(d.country || '—') + '</b></div>',
@@ -681,7 +681,7 @@
           '<div class="tiny muted" style="margin-bottom:6px">' + (LZ ? LZ('累计 ', 'Total ') : 'Total ') + money(custSum) + ' · ' + (LZ ? LZ('成交 ', 'won ') : 'won ') + wonCnt + ' ' + (LZ ? LZ('单', 'deals') : 'deals') + '</div>' +
           '<div class="dd-list">' + sameCust.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 6).map(row).join('') + '</div></div>' : ''),
 
-        (sameCode.length ? '<div class="dd-sec"><h4>' + (LZ ? LZ('这个型号的其他记录', 'Same part') : 'Same part') + '（' + sameCode.length + '）</h4>' +
+        (sameCode.length ? '<div class="dd-sec"><h4>' + (LZ ? LZ('这个款号的其他记录', 'Same style') : 'Same style') + '（' + sameCode.length + '）</h4>' +
           '<div class="dd-list">' + sameCode.slice().sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 6).map(row).join('') + '</div></div>' : '')
       ].join(''),
       footer: [
