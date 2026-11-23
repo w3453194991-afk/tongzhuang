@@ -138,25 +138,6 @@
       </div>
     </section>`;
 
-    const contact = `
-    <section class="site-sec contact">
-      <div class="contact-grid">
-        <div>
-          <h2>${zh ? '联系我们' : 'Contact us'}</h2>
-          <p class="muted">${zh ? '留下款式、尺码段和数量，我们按阶梯价回你。' : 'Leave the style, size band and quantity; we reply with tier pricing.'}</p>
-          <ul class="contact-list">
-            <li><b>${zh ? '地址' : 'Address'}</b> ${zh ? '浙江省湖州市吴兴区织里镇童装产业园 3 号楼' : 'Bldg 3, Zhili Kidswear Park, Wuxing, Huzhou, Zhejiang, China'}</li>
-            <li><b>${zh ? '电话' : 'Tel'}</b> +86-0572-3888 620</li>
-            <li><b>${zh ? '邮箱' : 'Email'}</b> sales@xiaomankids.com</li>
-          </ul>
-          <div class="row wrap-gap">
-            <button class="btn primary" data-act="askPrice">${zh ? '提交询价' : 'Send inquiry'}</button>
-            <button class="btn" data-act="tab" data-id="select">${zh ? '先选款' : 'Match a style first'}</button>
-          </div>
-        </div>
-      </div>
-    </section>`;
-
     const statline = `
     <div class="statline">
       <span><b>${st.products}</b> ${T('nav.products')}</span>
@@ -209,7 +190,7 @@
       </div>
     </details>`;
 
-    return hero + about + cats + tools + news + contact + statline + (isCust ? '' : todoCard) + why + `
+    return hero + about + cats + tools + news + statline + (isCust ? '' : todoCard) + why + `
       <footer class="site-foot">
         <img src="assets/img/site/logo-site.png" alt="XIAOMAN KIDS 小满童装">
         <span>© 2026 湖州小满童装有限公司 · HUZHOU XIAOMAN KIDS APPAREL CO., LTD. · 未经授权不得复制、镜像或二次分发</span>
