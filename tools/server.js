@@ -70,14 +70,16 @@ function sendJson(res, code, obj) {
 
 async function redfoxApi(req, res) {
   const u = url.parse(req.url, true);
-  const key = rfKey();
+  /* Key 优先级：服务端 env / 文件 > 浏览器请求头 x-redfox-key（只透传，不落盘） */
+  const clientKey = String(req.headers['x-redfox-key'] || '').trim();
+  const key = rfKey() || clientKey;
+  const keySource = process.env.REDFOX_KEY ? 'env' : (fs.existsSync(RF_KEY_FILE) ? 'file' : (clientKey ? 'client' : 'none'));
   const platform = String(u.query.platform || '').toLowerCase();
 
-  /* ---- Key 状态 / 写入（页面上不显示 Key，只在服务端保存） ---- */
+  /* ---- Key 状态 / 写入（服务端模式才用得到写入） ---- */
   if (u.pathname === '/api/redfox/status') {
     return sendJson(res, 200, {
-      ok: true, keySet: !!key,
-      source: process.env.REDFOX_KEY ? 'env' : (fs.existsSync(RF_KEY_FILE) ? 'file' : 'none')
+      ok: true, keySet: !!key, source: keySource
     });
   }
   if (u.pathname === '/api/redfox/key' && req.method === 'POST') {

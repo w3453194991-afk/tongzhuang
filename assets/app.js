@@ -3207,6 +3207,7 @@
     rfPlat(id) { window.REDFOX.setPlatform(id); vRedfox(); },
     rfRetry() { window.REDFOX.retry(() => vRedfox()); },
     rfKind(id) { window.REDFOX.setKind(id); vRedfox(); },
+    rfKeySet() { if (window.REDFOX.askKey()) window.REDFOX.sync(() => vRedfox(), true); },
     rfQuery() { window.REDFOX.runQuery(() => vRedfox()); },
     rfImportLead() {
       window.REDFOX.importLead({

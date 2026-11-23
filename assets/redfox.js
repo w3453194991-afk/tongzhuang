@@ -102,6 +102,31 @@
 
   const el = id => document.getElementById(id);
   const toast = m => { if (window.__toast) window.__toast(m); };
+
+  /* ---- RedFox Key：只存在这台浏览器，随请求头 x-redfox-key 透传给本机代理，不落服务器 ---- */
+  const KEY_LS = 'xm_redfox_key';
+  function localKey() { try { return (localStorage.getItem(KEY_LS) || '').trim(); } catch (e) { return ''; } }
+  function setLocalKey(k) {
+    try { k ? localStorage.setItem(KEY_LS, String(k).trim()) : localStorage.removeItem(KEY_LS); } catch (e) { }
+  }
+  function keyHeaders(extra) {
+    const h = Object.assign({}, extra || {});
+    const k = localKey();
+    if (k) h['x-redfox-key'] = k;
+    return h;
+  }
+  /* 支持一次性链接配置：?rfkey=ak_xxx 或 #/redfox?rfkey=ak_xxx，写进本机后把参数从地址栏抹掉 */
+  (function captureKeyFromUrl() {
+    try {
+      const hash = location.hash || '';
+      const src = location.search + (hash.indexOf('?') >= 0 ? '&' + hash.slice(hash.indexOf('?') + 1) : '');
+      const m = /[?&](?:rfkey|key)=([^&#]+)/.exec(src);
+      if (!m) return;
+      const k = decodeURIComponent(m[1]).trim();
+      if (k) setLocalKey(k);
+      history.replaceState(null, '', location.pathname + (hash.split('?')[0] || ''));
+    } catch (e) { }
+  })();
   const kindsOf = p => KINDS[p] || [];
   const curKind = () => kindsOf(ST.plat).find(k => k.id === ST.kind) || kindsOf(ST.plat)[0];
 
@@ -383,7 +408,7 @@
   async function restPost(path, payload) {
     const r = await fetch('/api/redfox/rest', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: keyHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ path, payload })
     });
     const text = await r.text();
@@ -571,10 +596,13 @@
     <div class="rf-head">
       <div>
         <h1 style="margin:0">${t2('热门追踪', 'Trending')} · RedFox</h1>
-        <div class="muted small">${t2('选平台 → 填一个词 → 直接出图和表。Key 配在服务端，页面上不显示；按次计费。', 'Pick a platform, type a keyword, get charts and a table. The key lives on the server, not in the page; calls are billed per request.')}</div>
+        <div class="muted small">${t2('选平台 → 填一个词 → 直接出图和表。Key 只存这台浏览器（不上传服务器），按次计费。', 'Pick a platform, type a keyword, get charts and a table. The key stays in this browser only; calls are billed per request.')}</div>
       </div>
       <div class="rf-head-r">
-        <span class="rf-pill ${ST.keySet ? 'on' : ''}">${ST.serverOk === false ? t2('服务端未连接', 'Server offline') : ST.keySet ? t2('已连接 · 服务端', 'Connected · server') : t2('服务端未配 Key', 'No key on server')}</span>
+        <span class="rf-pill ${ST.keySet ? 'on' : ''}">${ST.serverOk === false ? t2('服务端未连接', 'Server offline')
+      : ST.keySet ? (ST.keySource === 'client' ? t2('已连接 · 本机 Key', 'Connected · local key') : t2('已连接 · 服务端 Key', 'Connected · server key'))
+        : t2('还没填 Key', 'No key yet')}</span>
+        <button class="btn sm" data-act="rfKeySet">${localKey() ? t2('改 Key', 'Change key') : t2('填 Key', 'Set key')}</button>
         <a class="btn sm" href="https://redfox.hk/skills" target="_blank" rel="noopener">Skills 广场 ↗</a>
       </div>
     </div>
@@ -605,7 +633,7 @@
         </div>
         ${ST.err ? `<div class="rf-err">${esc(ST.err)}</div>` : (ST.msg ? `<div class="rf-ok">${esc(ST.msg)}</div>` : '')}
         ${ST.synced && ST.serverOk === false ? rfOffline(t2) : ''}
-        ${ST.synced && ST.serverOk && !ST.keySet ? `<div class="rf-err">${t2('服务端还没配 RedFox Key：把 Key 写进 tools/redfox-key.txt（或环境变量 REDFOX_KEY）后重启服务即可，页面上不用再填。', 'No RedFox key on the server yet. Put it in tools/redfox-key.txt (or REDFOX_KEY) and restart the server; nothing to type here.')}</div>` : ''}
+        ${ST.synced && ST.serverOk && !ST.keySet ? `<div class="rf-err">${t2('还没填 RedFox Key：点右上角「填 Key」粘贴即可（只存这台浏览器，不上传服务器，也不需要重启服务）。', 'No RedFox key yet: click “Set key” at the top right (it stays in this browser, never uploaded, no restart needed).')}</div>` : ''}
       </div>
     </div>
 
@@ -763,7 +791,7 @@
   async function callTool(tool, args) {
     const r = await fetch('/api/redfox/call?platform=' + encodeURIComponent(ST.plat), {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: keyHeaders({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({ tool, args })
     });
     const text = await r.text();
@@ -811,7 +839,7 @@
       } else {
         const r = await fetch('/api/redfox/rest', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: keyHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ path: kind.path, payload: buildPayload(kind) })
         });
         const text = await r.text();
@@ -888,32 +916,28 @@
     render();
   }
 
-  /* Key 由服务端保管：先把老版本存在浏览器里的 Key 交上去，再抹掉本地副本 */
-  async function migrateLegacyKey() {
-    let old = '';
-    try { old = localStorage.getItem('gy_redfox_key') || ''; } catch (e) { }
-    if (!old) return;
+  /* 老版本把 Key 存在 gy_redfox_key：搬到新的本机 Key，不上传服务器 */
+  function migrateLegacyKey() {
     try {
-      const r = await fetch('/api/redfox/key', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: old })
-      });
-      const j = await r.json();
-      if (j && j.ok) { try { localStorage.removeItem('gy_redfox_key'); } catch (e) { } }
+      const old = localStorage.getItem('gy_redfox_key') || '';
+      if (old) {
+        if (!localKey()) setLocalKey(old);
+        localStorage.removeItem('gy_redfox_key');
+      }
     } catch (e) { }
   }
   async function refreshStatus() {
     ST.statusAt = Date.now();
     try {
-      const r = await fetch('/api/redfox/status', { cache: 'no-store' });
+      const r = await fetch('/api/redfox/status', { cache: 'no-store', headers: keyHeaders() });
       const text = await r.text();
       let j = null;
       try { j = JSON.parse(text); } catch (e) { }
       if (!j) { ST.noApi = /^\s*</.test(text); throw new Error('HTTP ' + r.status); }
       if (!j.ok) throw new Error('bad status body');
-      ST.serverOk = true; ST.keySet = !!j.keySet; ST.noApi = false;
+      ST.serverOk = true; ST.keySet = !!j.keySet; ST.keySource = j.source || 'none'; ST.noApi = false;
     } catch (e) {
-      ST.serverOk = false; ST.keySet = false;
+      ST.serverOk = false; ST.keySet = false; ST.keySource = 'none';
     }
   }
   /* 重试间隔：先 3 秒一探，越试越慢，封顶 20 秒——服务起来后几秒内自己接上 */
@@ -999,6 +1023,15 @@
     state: ST,
     setPlatform(p) { if (ST.plat === p) return; ST.plat = p; ST.kind = (kindsOf(p)[0] || {}).id; ST.args = {}; ST.norm = null; ST.res = null; ST.err = ''; ST.msg = ''; },
     setKind(k) { ST.kind = k; ST.args = {}; ST.norm = null; ST.res = null; ST.err = ''; ST.msg = ''; },
-    clearRes() { ST.norm = null; ST.res = null; ST.err = ''; ST.msg = ''; }
+    clearRes() { ST.norm = null; ST.res = null; ST.err = ''; ST.msg = ''; },
+    /** 弹框填 Key（只存本机）；返回 true 表示有改动 */
+    askKey() {
+      const cur = localKey();
+      const v = window.prompt('RedFox API Key（只保存在这台浏览器，不会上传服务器；留空并确定 = 清除）', cur);
+      if (v === null) return false;
+      setLocalKey(v);
+      ST.synced = false;
+      return true;
+    }
   };
 })();
