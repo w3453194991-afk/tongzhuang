@@ -2275,10 +2275,10 @@
           <label>款式系列 / 尺码段<input id="asVeh" placeholder="例如 奶油小方 圆领卫衣 / 110 码"></label>
           <label>问题类型<select id="asType">${AS_TYPES.map(t => `<option>${t}</option>`).join('')}</select></label>
           <label>涉及数量<input id="asQty" type="number" min="0" placeholder="例如 40"></label>
-          <label>联系方式 *<input id="asContact" value="${esc(u.contact || '')}" placeholder="WhatsApp / 微信 / 邮箱"></label>
+          <label>联系方式 *<input id="asContact" value="${esc((u.contact || {}).value || '')}" placeholder="WhatsApp / 微信 / 邮箱"></label>
         </div>
         <label style="display:block;margin-top:10px">情况说明 *
-          <textarea id="asDesc" rows="4" style="width:100%;margin-top:4px" placeholder="什么时候装的、跑了多少公里、什么症状、有没有拍照"></textarea>
+          <textarea id="asDesc" rows="4" style="width:100%;margin-top:4px" placeholder="什么时候收到的、洗过几次、具体问题（起球 / 掉色 / 缩水 / 开线 / 尺码）"></textarea>
         </label>
         <div class="row wrap-gap" style="margin-top:12px">
           <button class="btn primary" data-act="asSend">提交</button>

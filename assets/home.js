@@ -190,13 +190,7 @@
       </div>
     </details>`;
 
-    return hero + about + cats + tools + news + statline + (isCust ? '' : todoCard) + why + `
-      <footer class="site-foot">
-        <img src="assets/img/site/logo-site.png" alt="XIAOMAN KIDS 小满童装">
-        <span>© 2026 湖州小满童装有限公司 · HUZHOU XIAOMAN KIDS APPAREL CO., LTD. · 未经授权不得复制、镜像或二次分发</span>
-        <span class="flex1"></span>
-        <span class="muted">${zh ? '本站数据用于选款与报价演示' : 'Demo data for style selection and quoting'}</span>
-      </footer>`;
+    return hero + about + cats + tools + news + statline + (isCust ? '' : todoCard) + why;
   }
 
   /* 实拍轮播 */

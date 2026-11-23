@@ -313,3 +313,23 @@ tbody tr.on{background:var(--accent-soft)}
 .ca-h .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1.6s infinite}
 .ca-b{font-size:12.5px;line-height:1.5}
 .ca-p{font-size:12px;color:var(--muted);margin-top:2px}
+/* ---------- 语音输入按钮 ---------- */
+.voice-btn{
+  display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9px;
+  border:1px solid var(--line);background:#fff;color:var(--ink-2);
+  font-size:13px;line-height:1;cursor:pointer;white-space:nowrap;flex:none;
+  transition:border-color .15s,color .15s,background .15s,box-shadow .15s;
+}
+.voice-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.voice-btn:active{transform:translateY(1px)}
+.voice-btn svg{flex:none}
+.voice-btn.on{
+  border-color:#d9534f;color:#c0392b;background:#fdecea;
+  animation:voicePulse 1.1s ease-in-out infinite;
+}
+@keyframes voicePulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(217,83,79,.35)}
+  50%{box-shadow:0 0 0 7px rgba(217,83,79,0)}
+}
+.cs-compose .voice-btn{padding:7px 10px}
+.fu-bar .voice-btn,.rf-form .voice-btn{margin-right:2px}
