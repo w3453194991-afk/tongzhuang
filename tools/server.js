@@ -390,8 +390,11 @@ http.createServer((req, res) => {
   if (req.url.indexOf('/api/store') === 0) return storeApi(req, res);
   let rel = decodeURIComponent(url.parse(req.url).pathname);
   if (rel === '/') rel = '/index.html';
-  /* 不进静态目录：数据与工具（含 Key）不能被浏览器直接下载 */
-  if (/^\/data\//i.test(rel) || /^\/tools\//i.test(rel) || /^\/\./.test(rel) || /\/(\.git|\.env)/i.test(rel)) {
+  /* 不进静态目录：数据、工具（含 Key）、文档与构建脚本都不能被浏览器直接下载 */
+  if (/^\/(data|tools|docs|build)(\/|$)/i.test(rel)
+    || /^\/[^\/]+\.md$/i.test(rel)
+    || /^\/(启动\.bat|停止\.bat|\.gitignore|\.gitattributes)$/i.test(rel)
+    || /^\/\./.test(rel) || /\/(\.git|\.env)/i.test(rel)) {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
     return res.end('404 Not Found: ' + rel);
   }
