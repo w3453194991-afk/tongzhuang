@@ -333,3 +333,16 @@ tbody tr.on{background:var(--accent-soft)}
 }
 .cs-compose .voice-btn{padding:7px 10px}
 .fu-bar .voice-btn,.rf-form .voice-btn{margin-right:2px}
+
+/* ---------- 聊天中的朗读按钮 ---------- */
+.tts-btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;margin:4px 0 0 6px;padding:0;border-radius:6px;
+  border:1px solid var(--line);background:#fff;color:var(--muted);
+  cursor:pointer;vertical-align:middle;transition:.15s;flex:none;
+}
+.tts-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.tts-btn.on{color:#c0392b;border-color:#d9534f;background:#fdecea;animation:voicePulse 1.1s ease-in-out infinite}
+.cs-msg .tts-btn{opacity:.55}
+.cs-msg:hover .tts-btn{opacity:1}
+#ttsToggle{white-space:nowrap}
